@@ -88,7 +88,7 @@ else
   exit 1
 fi
 
-APPLICATION_VERSION="$("$HERE/../../../scripts/shared/get-deploy-version.sh" -b "$ARGV_BASE_DIRECTORY" -v "$ARGV_VERSION_TYPE")"
+APPLICATION_VERSION="$("$HERE/../shared/get-deploy-version.sh" -b "$ARGV_BASE_DIRECTORY" -v "$ARGV_VERSION_TYPE")"
 
 # RPM and DEB packages can't handle hyphens in versions, which can
 # be the case if you have something like 1.0.0-beta.18
@@ -104,7 +104,7 @@ if [ "$ELECTRON_BUILDER_OS" = "linux" ]; then
   APPLICATION_NAME="$APPLICATION_NAME-electron"
 fi
 
-ELECTRON_BUILDER_ARCHITECTURE="$("$HERE/../../../scripts/shared/architecture-convert.sh" -r "$ARGV_ARCHITECTURE" -t electron-builder)"
+ELECTRON_BUILDER_ARCHITECTURE="$("$HERE/../shared/architecture-convert.sh" -r "$ARGV_ARCHITECTURE" -t electron-builder)"
 ELECTRON_BUILDER_CONFIG="$(mktemp)"
 
 node \
@@ -145,13 +145,13 @@ if [ "$ARGV_PACKAGE_TYPE" = "appimage" ]; then
     --extraMetadata.packageType="$ARGV_PACKAGE_TYPE"
   popd
 
-  PRODUCT_NAME="$("$HERE/../../../scripts/shared/resinci-read.sh" \
+  PRODUCT_NAME="$("$HERE/../shared/resinci-read.sh" \
     -b "$ARGV_BASE_DIRECTORY" \
     -p "builder.productName" \
     -l electron)"
   APPLICATION_DESCRIPTION="$(jq -r '.description' "$PACKAGE_JSON")"
-  APPIMAGE_ARCHITECTURE="$("$HERE/../../../scripts/shared/architecture-convert.sh" -r "$ARGV_ARCHITECTURE" -t appimage)"
-  ELECTRON_BUILDER_ARCHITECTURE="$("$HERE/../../../scripts/shared/architecture-convert.sh" -r "$ARGV_ARCHITECTURE" -t electron-builder)"
+  APPIMAGE_ARCHITECTURE="$("$HERE/../shared/architecture-convert.sh" -r "$ARGV_ARCHITECTURE" -t appimage)"
+  ELECTRON_BUILDER_ARCHITECTURE="$("$HERE/../shared/architecture-convert.sh" -r "$ARGV_ARCHITECTURE" -t electron-builder)"
   BUILD_DIRECTORY="$ARGV_BASE_DIRECTORY/dist"
 
   APPDIR_PATH="$BUILD_DIRECTORY/$APPLICATION_NAME-$APPLICATION_VERSION-linux.AppDir"
@@ -179,7 +179,7 @@ if [ "$ARGV_PACKAGE_TYPE" = "appimage" ]; then
     -w "$ARGV_TEMPORARY_DIRECTORY" \
     -o "$APPIMAGE_PATH"
 
-  "$HERE/../../../scripts/shared/zip-file.sh" \
+  "$HERE/../shared/zip-file.sh" \
     -f "$APPIMAGE_PATH" \
     -s linux \
     -o "$APPIMAGE_ZIP_PATH"

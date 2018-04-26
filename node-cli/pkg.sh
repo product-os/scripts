@@ -74,11 +74,11 @@ if [ -z "$ARGV_BASE_DIRECTORY" ] \
   usage
 fi
 
-PLATFORM_PKG="$("$HERE/../../../scripts/shared/platform-convert.sh" \
+PLATFORM_PKG="$("$HERE/../shared/platform-convert.sh" \
   -r "$ARGV_OPERATING_SYSTEM" \
   -t pkg)"
 
-ENTRYPOINT="$("$HERE/../../../scripts/shared/resinci-read.sh" \
+ENTRYPOINT="$("$HERE/../shared/resinci-read.sh" \
   -b "$ARGV_BASE_DIRECTORY" \
   -p main \
   -l "$ARGV_PIPELINE")"
@@ -94,7 +94,7 @@ if [ "$ENTRYPOINT" = "null" ]; then
 fi
 
 NAME="$(jq -r '.name' "$ARGV_BASE_DIRECTORY/package.json")"
-VERSION="$("$HERE/../../../scripts/shared/get-deploy-version.sh" -b "$ARGV_BASE_DIRECTORY" -v "$ARGV_VERSION_TYPE")"
+VERSION="$("$HERE/../shared/get-deploy-version.sh" -b "$ARGV_BASE_DIRECTORY" -v "$ARGV_VERSION_TYPE")"
 
 # We need to manually add the extension
 BINARY="$NAME"
@@ -102,7 +102,7 @@ if [ "$ARGV_OPERATING_SYSTEM" = "windows" ]; then
   BINARY="$BINARY.exe"
 fi
 
-NODE_VERSION="$("$HERE/../../../scripts/shared/resinci-read.sh" \
+NODE_VERSION="$("$HERE/../shared/resinci-read.sh" \
   -b "$ARGV_BASE_DIRECTORY" \
   -p node \
   -l "$ARGV_PIPELINE")"
@@ -122,7 +122,7 @@ TEMPORARY_DIRECTORY_APP="$ARGV_TEMPORARY_DIRECTORY/$OUTPUT_FILE-app"
 TEMPORARY_DIRECTORY_DIST="$ARGV_TEMPORARY_DIRECTORY/$OUTPUT_FILE-dist"
 mkdir -p "$TEMPORARY_DIRECTORY_APP" "$TEMPORARY_DIRECTORY_DIST"
 
-"$HERE/../../../scripts/shared/npm-install.sh" \
+"$HERE/../shared/npm-install.sh" \
   -b "$ARGV_BASE_DIRECTORY" \
   -r "$ARGV_ARCHITECTURE" \
   -t node \
@@ -133,7 +133,7 @@ mkdir -p "$TEMPORARY_DIRECTORY_APP" "$TEMPORARY_DIRECTORY_DIST"
   -a "${ARGV_AWS_BUCKET}" \
   -p
 
-"$HERE/../../../scripts/shared/apply-patches.sh" \
+"$HERE/../shared/apply-patches.sh" \
   -b "$ARGV_BASE_DIRECTORY" \
   -d "$TEMPORARY_DIRECTORY_APP"
 
@@ -159,7 +159,7 @@ if [ -n "$CSC_LINK" ] && [ -n "$CSC_KEY_PASSWORD" ]; then
 
   OS="$(uname -o 2>/dev/null || true)"
   if [[ "$OS" == "Msys" ]]; then
-    "$HERE/../../../scripts/shared/sign-exe.sh" \
+    "$HERE/../shared/sign-exe.sh" \
       -f "$TEMPORARY_DIRECTORY_DIST/$BINARY" \
       -d "$NAME - $VERSION"
   fi
@@ -186,7 +186,7 @@ if [ "$ARGV_OPERATING_SYSTEM" = "windows" ]; then
   FILENAME="${OUTPUT_FILE}.zip"
   OUTPUT_PATH="$DIST_DIRECTORY/${FILENAME}"
 
-  "$HERE/../../../scripts/shared/zip-file.sh" \
+  "$HERE/../shared/zip-file.sh" \
     -f "$TEMPORARY_DIRECTORY_DIST" \
     -s "$ARGV_OPERATING_SYSTEM" \
     -o "${OUTPUT_PATH}"
@@ -194,7 +194,7 @@ else
   FILENAME="${OUTPUT_FILE}.tar.gz"
   OUTPUT_PATH="$DIST_DIRECTORY/${FILENAME}"
 
-  "$HERE/../../../scripts/shared/tar-gz-file.sh" \
+  "$HERE/../shared/tar-gz-file.sh" \
     -f "$TEMPORARY_DIRECTORY_DIST" \
     -o "${OUTPUT_PATH}"
 fi
