@@ -89,7 +89,7 @@ APPIMAGES_TAG=6
 APPIMAGES_GITHUB_RAW_BASE_URL="https://raw.githubusercontent.com/probonopd/AppImageKit/$APPIMAGES_TAG"
 APPIMAGES_GITHUB_RELEASE_BASE_URL="https://github.com/probonopd/AppImageKit/releases/download/$APPIMAGES_TAG"
 
-"$HERE/../../../scripts/shared/download-tool.sh" -x \
+"$HERE/../shared/download-tool.sh" -x \
   -u "$APPIMAGES_GITHUB_RAW_BASE_URL/desktopintegration" \
   -c "bf321258134fa1290b3b3c005332d2aa04ca241e65c21c16c0ab76e892ef6044" \
   -o "$ARGV_OUTPUT/usr/bin/$ARGV_BINARY.wrapper"
@@ -105,7 +105,7 @@ else
   exit 1
 fi
 
-"$HERE/../../../scripts/shared/download-tool.sh" -x \
+"$HERE/../shared/download-tool.sh" -x \
   -u "$APPIMAGES_GITHUB_RELEASE_BASE_URL/AppRun_$APPIMAGES_TAG-$APPIMAGES_ARCHITECTURE" \
   -c "$APPRUN_CHECKSUM" \
   -o "$ARGV_OUTPUT/AppRun"

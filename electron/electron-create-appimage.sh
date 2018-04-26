@@ -77,7 +77,7 @@ APPIMAGES_GITHUB_RELEASE_BASE_URL="https://github.com/probonopd/AppImageKit/rele
 APPIMAGEASSISTANT_PATH="$ARGV_DOWNLOAD_DIRECTORY/AppImageAssistant-$ARGV_ARCHITECTURE.AppImage"
 mkdir -p "$ARGV_DOWNLOAD_DIRECTORY"
 
-"$HERE/../../../scripts/shared/download-tool.sh" -x \
+"$HERE/../shared/download-tool.sh" -x \
   -u "$APPIMAGES_GITHUB_RELEASE_BASE_URL/AppImageAssistant_$APPIMAGES_TAG-$APPIMAGES_ARCHITECTURE.AppImage" \
   -c "$APPIMAGEASSISTANT_CHECKSUM" \
   -o "$APPIMAGEASSISTANT_PATH"
