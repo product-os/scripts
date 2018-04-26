@@ -21,8 +21,8 @@ set -e
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-"$HERE/../../../scripts/shared/check-dependency.sh" jq
-"$HERE/../../../scripts/shared/check-dependency.sh" pkg
+"$HERE/../shared/check-dependency.sh" jq
+"$HERE/../shared/check-dependency.sh" pkg
 
 usage () {
   echo "Usage: $0" 1>&2

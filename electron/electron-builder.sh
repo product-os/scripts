@@ -21,9 +21,9 @@ set -e
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-"$HERE/../../../scripts/shared/check-dependency.sh" jq
-"$HERE/../../../scripts/shared/check-dependency.sh" node
-"$HERE/../../../scripts/shared/check-dependency.sh" build
+"$HERE/../shared/check-dependency.sh" jq
+"$HERE/../shared/check-dependency.sh" node
+"$HERE/../shared/check-dependency.sh" build
 
 usage () {
   echo "Usage: $0" 1>&2
