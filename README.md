@@ -1,5 +1,7 @@
 # Resin.io Scripts
 
+Maintainer: @brownjohnf
+
 This is a collection of scripts for running standard development and CI
 workflows. By contributing scripts here and consuming scripts from this
 repository, you can ensure that you're running things like tests and linting in
