@@ -54,6 +54,12 @@ if [ -z "$ARGV_BASE_DIRECTORY" ] \
 fi
 
 RESINCI_JSON=${ARGV_BASE_DIRECTORY}/.resinci.*
+
+if [ ! -f ${RESINCI_JSON} ]; then
+  echo "No .resinci.yml file found at ${RESINCI_JSON}" 1>&2
+  exit
+fi
+
 VALUE="$(yq r -j ${RESINCI_JSON} | jq -r ".[\"${ARGV_PIPELINE}\"].${ARGV_PROPERTY}")"
 
 if [ "$VALUE" = "null" ]; then
