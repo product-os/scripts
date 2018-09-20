@@ -47,5 +47,6 @@ fi
 
 if [ -f "$ARGV_BASE_DIRECTORY/requirements.txt" ]; then
   echo "Installing Python requirements"
-  pip install --quiet --requirement "$ARGV_BASE_DIRECTORY/requirements.txt"
+  pip install --ignore-installed --quiet --requirement "$ARGV_BASE_DIRECTORY/requirements.txt"
 fi
+
