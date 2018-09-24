@@ -103,6 +103,15 @@ if [ "$ARGV_TARGET_OPERATING_SYSTEM" = "windows" ]; then
   export npm_config_msvs_version="$MSVS_VERSION"
 fi
 
+if [ "$ARGV_TARGET_OPERATING_SYSTEM" = "linux" ] && \
+  [ "$(uname -m)" = "x86_64" ] && \
+  [ "$ARGV_ARCHITECTURE" = "x86" ]
+then
+  # Support x86 builds from x64 in GNU/Linux
+  # See https://github.com/addaleax/lzma-native/issues/27
+  export CFLAGS += -m32
+fi
+
 if [ "$ARGV_TARGET_PLATFORM" = "electron" ]; then
 
   # Ensure native addons are compiled with the correct headers
@@ -223,11 +232,19 @@ function run_install() {
 
     if command -v aws 2>/dev/null 1>&2 && [ -n "$AWS_ACCESS_KEY_ID" ] && [ -n "$AWS_SECRET_ACCESS_KEY" ]; then
       echo "Uploading to S3 ($ARGV_S3_BUCKET)"
+      set +e
       aws s3api put-object \
         --bucket "$ARGV_S3_BUCKET" \
         --acl public-read \
         --key "$S3_KEY" \
         --body "$RESINCI_CACHE_DIRECTORY/$CACHE_KEY"
+      CODE="$?"
+      set -e
+      if [ "$CODE" != "255" ]; then
+        exit "$CODE"
+      else
+        echo "Continuing without uploading cache..."
+      fi
     fi
   fi
 }
