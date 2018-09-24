@@ -109,7 +109,9 @@ if [ "$ARGV_TARGET_OPERATING_SYSTEM" = "linux" ] && \
 then
   # Support x86 builds from x64 in GNU/Linux
   # See https://github.com/addaleax/lzma-native/issues/27
+  set +u
   export CFLAGS="$CFLAGS -m32"
+  set -u
 fi
 
 if [ "$ARGV_TARGET_PLATFORM" = "electron" ]; then
