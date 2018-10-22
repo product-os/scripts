@@ -41,6 +41,7 @@ usage () {
   echo "    -a <amazon aws bucket>" 1>&2
   echo "    [-x <install prefix>]" 1>&2
   echo "    [-p production install]" 1>&2
+  echo "    [-i do not upload cache]" 1>&2
   exit 1
 }
 
@@ -53,8 +54,9 @@ ARGV_PIPELINE=""
 ARGV_S3_BUCKET=""
 ARGV_PREFIX=""
 ARGV_PRODUCTION=false
+ARGV_DONT_UPLOAD_CACHE=false
 
-while getopts ":b:r:t:s:n:l:a:x:p" option; do
+while getopts ":b:r:t:s:n:l:a:x:pi" option; do
   case $option in
     b) ARGV_BASE_DIRECTORY=$OPTARG ;;
     r) ARGV_ARCHITECTURE=$OPTARG ;;
@@ -65,6 +67,7 @@ while getopts ":b:r:t:s:n:l:a:x:p" option; do
     a) ARGV_S3_BUCKET=$OPTARG ;;
     x) ARGV_PREFIX=$OPTARG ;;
     p) ARGV_PRODUCTION=true ;;
+    i) ARGV_DONT_UPLOAD_CACHE=true ;;
     *) usage ;;
   esac
 done
@@ -199,7 +202,9 @@ function run_install() {
     echo "Decompressing $CACHE_KEY"
     tar fzx "$RESINCI_CACHE_DIRECTORY/$CACHE_KEY"
   else
-    UPLOAD_CACHE=true
+    if [ "$ARGV_DONT_UPLOAD_CACHE" != "true" ]; then
+      UPLOAD_CACHE=true
+    fi
 
     # When changing between target architectures, rebuild all dependencies,
     # since compiled add-ons will not work otherwise.
