@@ -209,10 +209,10 @@ function run_install() {
     # When changing between target architectures, rebuild all dependencies,
     # since compiled add-ons will not work otherwise.
     echo "Rebuilding native modules"
-    npm rebuild
+    npm rebuild --build-from-source
 
     echo "Installing dependencies"
-    npm install
+    npm install --build-from-source
   fi
 
   if [ "$ARGV_PRODUCTION" == "true" ]; then
