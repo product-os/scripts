@@ -55,6 +55,8 @@ ARGV_S3_BUCKET=""
 ARGV_PREFIX=""
 ARGV_PRODUCTION=false
 ARGV_DONT_UPLOAD_CACHE=false
+AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID:-}
+AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY:-}
 
 while getopts ":b:r:t:s:n:l:a:x:pi" option; do
   case $option in
