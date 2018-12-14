@@ -60,6 +60,11 @@ then
   usage
 fi
 
+# For debugging purposes
+npm --version
+node --version
+node -p "process" | grep arch
+
 "$HERE/../shared/npm-install.sh" \
   -b "$ARGV_BASE_DIRECTORY" \
   -r "$ARGV_ARCHITECTURE" \
