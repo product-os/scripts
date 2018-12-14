@@ -132,6 +132,22 @@ else
   ELECTRON_BUILDER_OPTIONS+=" --extraMetadata.analytics.mixpanel.token=${ANALYTICS_MIXPANEL_TOKEN}"
 fi
 
+if [ "$ELECTRON_BUILDER_OS" = "win" ]; then
+  export ELECTRON_BUILDER_ALLOW_UNRESOLVED_DEPENDENCIES=1
+
+  # Export the path that's added by running
+  # C:\Program Files (x86)\Microsoft Visual C++ Build Tools\vcbuildtools.bat
+  # on the windows node. This should allow us to find signtool.exe
+  # in /c/Program\ Files\ \(x86\)/Windows\ Kits/10/bin/x86
+  NEW_PATH="/c/Program Files (x86)/MSBuild/14.0/bin"
+  NEW_PATH+=":/c/Program Files (x86)/Microsoft Visual Studio 14.0/VC/BIN"
+  NEW_PATH+=":/c/Windows/Microsoft.Net/Framework/v4.0.30319"
+  NEW_PATH+=":/c/Windows/Microsoft.Net/Framework"
+  NEW_PATH+=":/c/Program Files (x86)/Windows Kits/10/bin/x86"
+  NEW_PATH+=":/c/Program Files (x86)/Microsoft SDKs/Windows/v10.0A/bin/NETFX 4.6.1 Tools"
+  export PATH="$NEW_PATH:$PATH"
+fi
+
 # For now we build AppImages in a very custom way due to
 # issues on the electron-builder project
 if [ "$ARGV_PACKAGE_TYPE" = "appimage" ]; then
