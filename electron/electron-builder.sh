@@ -133,8 +133,6 @@ else
 fi
 
 if [ "$ELECTRON_BUILDER_OS" = "win" ]; then
-  export ELECTRON_BUILDER_ALLOW_UNRESOLVED_DEPENDENCIES=1
-
   # Export the path that's added by running
   # C:\Program Files (x86)\Microsoft Visual C++ Build Tools\vcbuildtools.bat
   # on the windows node. This should allow us to find signtool.exe
@@ -148,10 +146,17 @@ if [ "$ELECTRON_BUILDER_OS" = "win" ]; then
   export PATH="$NEW_PATH:$PATH"
 fi
 
+if [ -z ${ELECTRON_BUILDER_ALLOW_UNRESOLVED_DEPENDENCIES-} ]; then
+  ELECTRON_BUILDER_ALLOW_UNRESOLVED_DEPENDENCIES=${ELECTRON_BUILDER_ALLOW_UNRESOLVED_DEPENDENCIES-}
+else
+  ELECTRON_BUILDER_ALLOW_UNRESOLVED_DEPENDENCIES="true"
+fi
+
 # For now we build AppImages in a very custom way due to
 # issues on the electron-builder project
 if [ "$ARGV_PACKAGE_TYPE" = "appimage" ]; then
   pushd "$ARGV_BASE_DIRECTORY"
+  ELECTRON_BUILDER_ALLOW_UNRESOLVED_DEPENDENCIES="$ELECTRON_BUILDER_ALLOW_UNRESOLVED_DEPENDENCIES" \
   TARGET_ARCH="$ARGV_ARCHITECTURE" \
     build --dir "--$ELECTRON_BUILDER_OS" ${ELECTRON_BUILDER_OPTIONS} \
     "--$ELECTRON_BUILDER_ARCHITECTURE" \
@@ -201,6 +206,7 @@ if [ "$ARGV_PACKAGE_TYPE" = "appimage" ]; then
     -o "$APPIMAGE_ZIP_PATH"
 else
   pushd "$ARGV_BASE_DIRECTORY"
+  ELECTRON_BUILDER_ALLOW_UNRESOLVED_DEPENDENCIES="$ELECTRON_BUILDER_ALLOW_UNRESOLVED_DEPENDENCIES" \
   TARGET_ARCH="$ARGV_ARCHITECTURE" \
     build "--$ELECTRON_BUILDER_OS" "$ARGV_PACKAGE_TYPE" ${ELECTRON_BUILDER_OPTIONS} \
     "--$ELECTRON_BUILDER_ARCHITECTURE" \
