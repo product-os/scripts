@@ -73,8 +73,6 @@ node -p "process" | grep arch
   -n "$ARGV_NPM_DATA_DIRECTORY" \
   -a "$ARGV_S3_BUCKET" \
   -l electron
-"$HERE/../shared/apply-patches.sh" \
-  -b "$ARGV_BASE_DIRECTORY" \
 "$HERE/../shared/npm-execute-script.sh" \
   -b "$ARGV_BASE_DIRECTORY" \
   -s concourse-build-electron \

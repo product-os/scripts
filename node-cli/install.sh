@@ -68,9 +68,3 @@ fi
   -n "$ARGV_NPM_DATA_DIRECTORY" \
   -a "$ARGV_S3_BUCKET" \
   -l node-cli
-"$HERE/../shared/apply-patches.sh" \
-  -b "$ARGV_BASE_DIRECTORY" \
-"$HERE/../shared/npm-execute-script.sh" \
-  -b "$ARGV_BASE_DIRECTORY" \
-  -s concourse-build-node-cli \
-  -o

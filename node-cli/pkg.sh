@@ -142,10 +142,6 @@ mkdir -p "$TEMPORARY_DIRECTORY_APP" "$TEMPORARY_DIRECTORY_DIST"
   -a "${ARGV_AWS_BUCKET}" \
   -p
 
-"$HERE/../shared/apply-patches.sh" \
-  -b "$ARGV_BASE_DIRECTORY" \
-  -d "$TEMPORARY_DIRECTORY_APP"
-
 cp -r "$ARGV_BASE_DIRECTORY/lib" "$TEMPORARY_DIRECTORY_APP"
 
 if [ -d "$ARGV_BASE_DIRECTORY/build" ]; then
