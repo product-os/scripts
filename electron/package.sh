@@ -29,21 +29,27 @@ usage () {
   echo "    -b <base project directory>" 1>&2
   echo "    -r <architecture>" 1>&2
   echo "    -s <target operating system>" 1>&2
-  echo "    -m <npm version>" 1>&2
+  echo "    -v <version type (production|prerelease|snapshot)>" 1>&2
+  echo "    -n <npm data directory>" 1>&2
+  echo "    -w <temporary directory>" 1>&2
   exit 1
 }
 
 ARGV_BASE_DIRECTORY=""
 ARGV_ARCHITECTURE=""
 ARGV_TARGET_OPERATING_SYSTEM=""
-ARGV_NPM_VERSION=""
+ARGV_VERSION_TYPE=""
+ARGV_NPM_DATA_DIRECTORY=""
+ARGV_TEMPORARY_DIRECTORY=""
 
-while getopts ":b:r:s:m:" option; do
+while getopts ":b:r:s:v:n:w:" option; do
   case $option in
     b) ARGV_BASE_DIRECTORY=$OPTARG ;;
     r) ARGV_ARCHITECTURE=$OPTARG ;;
     s) ARGV_TARGET_OPERATING_SYSTEM=$OPTARG ;;
-    m) ARGV_NPM_VERSION=$OPTARG ;;
+    v) ARGV_VERSION_TYPE=$OPTARG ;;
+    n) ARGV_NPM_DATA_DIRECTORY=$OPTARG ;;
+    w) ARGV_TEMPORARY_DIRECTORY=$OPTARG ;;
     *) usage ;;
   esac
 done
@@ -51,33 +57,37 @@ done
 if [ -z "$ARGV_BASE_DIRECTORY" ] \
   || [ -z "$ARGV_ARCHITECTURE" ] \
   || [ -z "$ARGV_TARGET_OPERATING_SYSTEM" ] \
-  || [ -z "$ARGV_NPM_VERSION" ]
+  || [ -z "$ARGV_VERSION_TYPE" ] \
+  || [ -z "$ARGV_NPM_DATA_DIRECTORY" ] \
+  || [ -z "$ARGV_TEMPORARY_DIRECTORY" ]
 then
   usage
 fi
 
+if [ "$ARGV_TARGET_OPERATING_SYSTEM" = "linux" ]; then
+  TARGETS="deb rpm appimage"
+elif [ "$ARGV_TARGET_OPERATING_SYSTEM" = "darwin" ]; then
+  TARGETS="dmg zip"
+elif [ "$ARGV_TARGET_OPERATING_SYSTEM" = "windows" ]; then
+  TARGETS="nsis portable"
+fi
 
-if [ "$ARGV_TARGET_OPERATING_SYSTEM" == "darwin" ]; then
-  chown -RL resin:staff app-git
-  su resin -c "$HERE/../shared/npm-install.sh \
-    -b \"$ARGV_BASE_DIRECTORY\" \
-    -r \"$ARGV_ARCHITECTURE\" \
-    -t electron \
-    -s \"$ARGV_TARGET_OPERATING_SYSTEM\" \
-    -m \"$ARGV_NPM_VERSION\" \
-    -l electron"
-else
-  "$HERE/../shared/npm-install.sh" \
+if [ -z "$TARGETS" ]; then
+  echo "No targets configured for $ARGV_TARGET_OPERATING_SYSTEM" 1>&2
+  exit 1
+fi
+
+for target in $TARGETS; do
+  "$HERE/electron-builder.sh" \
     -b "$ARGV_BASE_DIRECTORY" \
     -r "$ARGV_ARCHITECTURE" \
-    -t electron \
-    -s "$ARGV_TARGET_OPERATING_SYSTEM" \
-    -m "$ARGV_NPM_VERSION" \
-    -l electron
-fi
-"$HERE/../shared/apply-patches.sh" \
-  -b "$ARGV_BASE_DIRECTORY"
-"$HERE/../shared/npm-execute-script.sh" \
-  -b "$ARGV_BASE_DIRECTORY" \
-  -s concourse-build-electron \
-  -o
+    -t "$target" \
+    -v "$ARGV_VERSION_TYPE" \
+    -w "$ARGV_TEMPORARY_DIRECTORY" \
+    -n "$ARGV_NPM_DATA_DIRECTORY"
+done
+
+find $(pwd)/app-git/dist \
+  -type f \
+  -maxdepth 1 \
+  -exec cp {} $(pwd)/dist-${ARGV_TARGET_OPERATING_SYSTEM}-${ARGV_ARCHITECTURE}/ \;
