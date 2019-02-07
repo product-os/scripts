@@ -36,9 +36,9 @@ usage () {
   echo "    -r <architecture>" 1>&2
   echo "    -t <target platform (node|electron)>" 1>&2
   echo "    -s <target operating system>" 1>&2
-  echo "    -n <npm data directory>" 1>&2
   echo "    -l <pipeline name>" 1>&2
   echo "    -a <amazon aws bucket>" 1>&2
+  echo "    [-n <npm data directory>]" 1>&2
   echo "    [-x <install prefix>]" 1>&2
   echo "    [-m <npm version (defaults to 3.10.10)>]" 1>&2
   echo "    [-p production install]" 1>&2
@@ -81,22 +81,23 @@ if [ -z "$ARGV_BASE_DIRECTORY" ] \
   || [ -z "$ARGV_ARCHITECTURE" ] \
   || [ -z "$ARGV_TARGET_PLATFORM" ] \
   || [ -z "$ARGV_TARGET_OPERATING_SYSTEM" ] \
-  || [ -z "$ARGV_NPM_DATA_DIRECTORY" ] \
   || [ -z "$ARGV_PIPELINE" ]
 then
   usage
 fi
 
-RESINCI_CACHE_DIRECTORY="$ARGV_NPM_DATA_DIRECTORY/_resinci"
-mkdir -p "$RESINCI_CACHE_DIRECTORY"
+if ! [ -z "$ARGV_NPM_DATA_DIRECTORY" ]; then
+  RESINCI_CACHE_DIRECTORY="$ARGV_NPM_DATA_DIRECTORY/_resinci"
+  mkdir -p "$RESINCI_CACHE_DIRECTORY"
 
-# Setup scoped npm prefix and cache directories
-export npm_config_prefix="$ARGV_NPM_DATA_DIRECTORY/npm"
-export npm_config_cache="$ARGV_NPM_DATA_DIRECTORY/npm-cache"
-export npm_config_tmp="$ARGV_NPM_DATA_DIRECTORY/temp"
-mkdir -p "$npm_config_prefix"
-mkdir -p "$npm_config_cache"
-mkdir -p "$npm_config_tmp"
+  # Setup scoped npm prefix and cache directories
+  export npm_config_prefix="$ARGV_NPM_DATA_DIRECTORY/npm"
+  export npm_config_cache="$ARGV_NPM_DATA_DIRECTORY/npm-cache"
+  export npm_config_tmp="$ARGV_NPM_DATA_DIRECTORY/temp"
+  mkdir -p "$npm_config_prefix"
+  mkdir -p "$npm_config_cache"
+  mkdir -p "$npm_config_tmp"
+fi
 
 # Proper log level
 export npm_config_loglevel=warn
@@ -188,7 +189,7 @@ S3_KEY="resinci/node_modules/$CACHE_KEY"
 S3_URL="https://$ARGV_S3_BUCKET.s3.amazonaws.com/$S3_KEY"
 
 function run_install() {
-  if [ -z $ARGV_S3_BUCKET ]; then
+  if [ -z $ARGV_S3_BUCKET ] || [ -z $ARGV_NPM_DATA_DIRECTORY ]; then
     echo "Installing dependencies"
     npx npm@$ARGV_NPM_VERSION install --build-from-source
     return
