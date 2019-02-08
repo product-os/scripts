@@ -36,10 +36,11 @@ usage () {
   echo "    -r <architecture>" 1>&2
   echo "    -t <target platform (node|electron)>" 1>&2
   echo "    -s <target operating system>" 1>&2
-  echo "    -n <npm data directory>" 1>&2
   echo "    -l <pipeline name>" 1>&2
   echo "    -a <amazon aws bucket>" 1>&2
+  echo "    [-n <npm data directory>]" 1>&2
   echo "    [-x <install prefix>]" 1>&2
+  echo "    [-m <npm version (defaults to 3.10.10)>]" 1>&2
   echo "    [-p production install]" 1>&2
   echo "    [-i do not upload cache]" 1>&2
   exit 1
@@ -53,12 +54,13 @@ ARGV_NPM_DATA_DIRECTORY=""
 ARGV_PIPELINE=""
 ARGV_S3_BUCKET=""
 ARGV_PREFIX=""
+ARGV_NPM_VERSION="3.10.10"
 ARGV_PRODUCTION=false
 ARGV_DONT_UPLOAD_CACHE=false
 AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID:-}
 AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY:-}
 
-while getopts ":b:r:t:s:n:l:a:x:pi" option; do
+while getopts ":b:r:t:s:n:l:a:x:m:pi" option; do
   case $option in
     b) ARGV_BASE_DIRECTORY=$OPTARG ;;
     r) ARGV_ARCHITECTURE=$OPTARG ;;
@@ -68,6 +70,7 @@ while getopts ":b:r:t:s:n:l:a:x:pi" option; do
     l) ARGV_PIPELINE=$OPTARG ;;
     a) ARGV_S3_BUCKET=$OPTARG ;;
     x) ARGV_PREFIX=$OPTARG ;;
+    m) ARGV_NPM_VERSION=$OPTARG ;;
     p) ARGV_PRODUCTION=true ;;
     i) ARGV_DONT_UPLOAD_CACHE=true ;;
     *) usage ;;
@@ -78,22 +81,23 @@ if [ -z "$ARGV_BASE_DIRECTORY" ] \
   || [ -z "$ARGV_ARCHITECTURE" ] \
   || [ -z "$ARGV_TARGET_PLATFORM" ] \
   || [ -z "$ARGV_TARGET_OPERATING_SYSTEM" ] \
-  || [ -z "$ARGV_NPM_DATA_DIRECTORY" ] \
   || [ -z "$ARGV_PIPELINE" ]
 then
   usage
 fi
 
-RESINCI_CACHE_DIRECTORY="$ARGV_NPM_DATA_DIRECTORY/_resinci"
-mkdir -p "$RESINCI_CACHE_DIRECTORY"
+if ! [ -z "$ARGV_NPM_DATA_DIRECTORY" ]; then
+  RESINCI_CACHE_DIRECTORY="$ARGV_NPM_DATA_DIRECTORY/_resinci"
+  mkdir -p "$RESINCI_CACHE_DIRECTORY"
 
-# Setup scoped npm prefix and cache directories
-export npm_config_prefix="$ARGV_NPM_DATA_DIRECTORY/npm"
-export npm_config_cache="$ARGV_NPM_DATA_DIRECTORY/npm-cache"
-export npm_config_tmp="$ARGV_NPM_DATA_DIRECTORY/temp"
-mkdir -p "$npm_config_prefix"
-mkdir -p "$npm_config_cache"
-mkdir -p "$npm_config_tmp"
+  # Setup scoped npm prefix and cache directories
+  export npm_config_prefix="$ARGV_NPM_DATA_DIRECTORY/npm"
+  export npm_config_cache="$ARGV_NPM_DATA_DIRECTORY/npm-cache"
+  export npm_config_tmp="$ARGV_NPM_DATA_DIRECTORY/temp"
+  mkdir -p "$npm_config_prefix"
+  mkdir -p "$npm_config_cache"
+  mkdir -p "$npm_config_tmp"
+fi
 
 # Proper log level
 export npm_config_loglevel=warn
@@ -185,6 +189,11 @@ S3_KEY="resinci/node_modules/$CACHE_KEY"
 S3_URL="https://$ARGV_S3_BUCKET.s3.amazonaws.com/$S3_KEY"
 
 function run_install() {
+  if [ -z $ARGV_S3_BUCKET ] || [ -z $ARGV_NPM_DATA_DIRECTORY ]; then
+    echo "Installing dependencies"
+    npx npm@$ARGV_NPM_VERSION install --build-from-source
+    return
+  fi
   UPLOAD_CACHE=false
   CACHE_STATUS_CODE="$(curl -k --silent --head --location "$S3_URL" | grep "^HTTP" | awk '{print $2}')"
 
@@ -211,10 +220,10 @@ function run_install() {
     # When changing between target architectures, rebuild all dependencies,
     # since compiled add-ons will not work otherwise.
     echo "Rebuilding native modules"
-    npm rebuild --build-from-source
+    npx npm@$ARGV_NPM_VERSION rebuild --build-from-source
 
     echo "Installing dependencies"
-    npm install --build-from-source
+    npx npm@$ARGV_NPM_VERSION install --build-from-source
   fi
 
   if [ "$ARGV_PRODUCTION" == "true" ]; then
@@ -224,7 +233,7 @@ function run_install() {
     # really development dependencies. As a workaround, we manually
     # delete the development dependencies using `npm prune`.
     echo "Pruning development dependencies"
-    PATH=$(pwd)/node_modules/.bin:$PATH npm prune --production
+    PATH=$(pwd)/node_modules/.bin:$PATH npx npm@$ARGV_NPM_VERSION prune --production
   else
     # Since we use an `npm-shrinkwrap.json` file, if you pull changes
     # that update a dependency and try to `npm install` directly, npm
@@ -232,7 +241,7 @@ function run_install() {
     # is defined by the `npm-shrinkwrap.json` file, and will thus
     # refuse to do anything but install from scratch.
     echo "Pruning node_modules"
-    PATH=$(pwd)/node_modules/.bin:$PATH npm prune
+    PATH=$(pwd)/node_modules/.bin:$PATH npx npm@$ARGV_NPM_VERSION prune
   fi
 
   if [ "$UPLOAD_CACHE" = "true" ]; then

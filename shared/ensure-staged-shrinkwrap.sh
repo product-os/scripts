@@ -17,7 +17,6 @@
 ###
 
 set -e
-set -u
 
 usage () {
   echo "Usage: $0" 1>&2
@@ -50,7 +49,11 @@ fi
 
 cd "$ARGV_BASE_DIRECTORY"
 
-npm shrinkwrap --dev
+if [ -z $NPM_VERSION ]; then
+  npm shrinkwrap --dev
+else
+  npx npm@$NPM_VERSION shrinkwrap --dev
+fi
 
 if [ -n "$(git status -s "$SHRINKWRAP_FILE")" ]; then
   echo "There are unstaged $SHRINKWRAP_FILE changes. Please commit the result of:" 1>&2

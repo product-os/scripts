@@ -46,4 +46,4 @@ cd "$ARGV_BASE_DIRECTORY"
 # This command will exit with an error code if there
 # are invalid or extraneous dependencies, printing the
 # problematic ones if so.
-npm ls >/dev/null
+npx npm@$NPM_VERSION ls >/dev/null
