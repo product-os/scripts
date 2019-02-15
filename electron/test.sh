@@ -33,6 +33,7 @@ usage () {
 
 ARGV_BASE_DIRECTORY=""
 ARGV_TARGET_OPERATING_SYSTEM=""
+XVFB_ARGS="${XVFB_ARGS:-}"
 
 while getopts ":b:s:" option; do
   case $option in
@@ -57,7 +58,7 @@ if [ "$ARGV_TARGET_OPERATING_SYSTEM" = "linux" ]; then
     -b "$ARGV_BASE_DIRECTORY" \
     -s concourse-test-electron
 else
-  env ELECTRON_NO_ATTACH_CONSOLE=true" $HERE/../shared/npm-execute-script.sh" \
+  env ELECTRON_NO_ATTACH_CONSOLE=true "$HERE/../shared/npm-execute-script.sh" \
     -b "$ARGV_BASE_DIRECTORY" \
     -s concourse-test-electron
 fi
