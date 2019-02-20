@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -ex
 ARGV_DIRECTORY="$1"
 set -u
 
