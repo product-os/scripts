@@ -47,9 +47,9 @@ fi
 RESULT=""
 
 if [ "$ARGV_TYPE" == "node" ]; then
-  if [ "$ARGV_ARCHITECTURE" == "x86" ]; then
+  if [ "$ARGV_ARCHITECTURE" == "x86" ] ; then
     RESULT=ia32
-  elif [ "$ARGV_ARCHITECTURE" == "x64" ]; then
+  elif [ "$ARGV_ARCHITECTURE" == "x64" ] || [ "$ARGV_ARCHITECTURE" == "x86_64" ]; then
     RESULT=x64
   elif [ "$ARGV_ARCHITECTURE" == "armv7hf" ]; then
     RESULT=arm

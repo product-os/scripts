@@ -68,12 +68,7 @@ then
   usage
 fi
 
-"$HERE/pkg.sh" \
-  -a "$ARGV_S3_BUCKET" \
+"$HERE/../shared/npm-execute-script.sh" \
   -b "$ARGV_BASE_DIRECTORY" \
-  -n "$ARGV_NPM_DATA_DIRECTORY" \
-  -v "$ARGV_VERSION_TYPE" \
-  -o "$ARGV_TARGET_OPERATING_SYSTEM" \
-  -p node-cli \
-  -r "$ARGV_ARCHITECTURE" \
-  -w "$ARGV_TEMPORARY_DIRECTORY"
+  -s concourse-build-node-cli \
+  -o

@@ -29,24 +29,21 @@ usage () {
   echo "    -b <base project directory>" 1>&2
   echo "    -r <architecture>" 1>&2
   echo "    -s <target operating system>" 1>&2
-  echo "    -n <npm data directory>" 1>&2
-  echo "    -a <amazon aws bucket>" 1>&2
+  echo "    -m <npm version>" 1>&2
   exit 1
 }
 
 ARGV_BASE_DIRECTORY=""
 ARGV_ARCHITECTURE=""
 ARGV_TARGET_OPERATING_SYSTEM=""
-ARGV_NPM_DATA_DIRECTORY=""
-ARGV_S3_BUCKET=""
+ARGV_NPM_VERSION=""
 
-while getopts ":b:r:s:n:a:" option; do
+while getopts ":b:r:s:m:" option; do
   case $option in
     b) ARGV_BASE_DIRECTORY=$OPTARG ;;
     r) ARGV_ARCHITECTURE=$OPTARG ;;
     s) ARGV_TARGET_OPERATING_SYSTEM=$OPTARG ;;
-    n) ARGV_NPM_DATA_DIRECTORY=$OPTARG ;;
-    a) ARGV_S3_BUCKET=$OPTARG ;;
+    m) ARGV_NPM_VERSION=$OPTARG ;;
     *) usage ;;
   esac
 done
@@ -54,8 +51,7 @@ done
 if [ -z "$ARGV_BASE_DIRECTORY" ] \
   || [ -z "$ARGV_ARCHITECTURE" ] \
   || [ -z "$ARGV_TARGET_OPERATING_SYSTEM" ] \
-  || [ -z "$ARGV_NPM_DATA_DIRECTORY" ] \
-  || [ -z "$ARGV_S3_BUCKET" ]
+  || [ -z "$ARGV_NPM_VERSION" ]
 then
   usage
 fi
@@ -65,12 +61,5 @@ fi
   -r "$ARGV_ARCHITECTURE" \
   -t node \
   -s "$ARGV_TARGET_OPERATING_SYSTEM" \
-  -n "$ARGV_NPM_DATA_DIRECTORY" \
-  -a "$ARGV_S3_BUCKET" \
+  -m "$ARGV_NPM_VERSION" \
   -l node-cli
-"$HERE/../shared/apply-patches.sh" \
-  -b "$ARGV_BASE_DIRECTORY" \
-"$HERE/../shared/npm-execute-script.sh" \
-  -b "$ARGV_BASE_DIRECTORY" \
-  -s concourse-build-node-cli \
-  -o
