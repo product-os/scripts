@@ -6,9 +6,8 @@ set -u
 cd $ARGV_DIRECTORY
 
 version=$(jq -r '.version' package.json)
-
-repo=$(jq -r '.base_repo' .git/.version)
+pkg_name=$(jq -r '.name' package.json)
 
 npm pack
 
-mv ${repo}-${version} build
+mv ${pkg_name}-${version}.tgz build
