@@ -3,7 +3,7 @@ set -ex
 ARGV_DIRECTORY="$1"
 set -u
 
-popd $ARGV_DIRECTORY
+cd $ARGV_DIRECTORY
 
 version=$(jq -r '.version' package.json)
 pkg_name=$(jq -r '.name' package.json)

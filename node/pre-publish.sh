@@ -1,2 +1,5 @@
 #!/bin/bash
-ls build
+pwd
+ls
+cd build
+ls
