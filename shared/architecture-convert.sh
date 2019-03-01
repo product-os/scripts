@@ -53,6 +53,8 @@ if [ "$ARGV_TYPE" == "node" ]; then
     RESULT=x64
   elif [ "$ARGV_ARCHITECTURE" == "armv7hf" ]; then
     RESULT=arm
+  elif [ "$ARGV_ARCHITECTURE" == "aarch64" ]; then
+    RESULT=arm64
   fi
 elif [ "$ARGV_TYPE" == "electron-builder" ]; then
   if [ "$ARGV_ARCHITECTURE" == "x86" ]; then
@@ -61,6 +63,8 @@ elif [ "$ARGV_TYPE" == "electron-builder" ]; then
     RESULT=x64
   elif [ "$ARGV_ARCHITECTURE" == "armv7hf" ]; then
     RESULT=armv7l
+  elif [ "$ARGV_ARCHITECTURE" == "aarch64" ]; then
+    RESULT=arm64
   fi
 elif [ "$ARGV_TYPE" == "debian" ]; then
   if [ "$ARGV_ARCHITECTURE" == "x86" ]; then
