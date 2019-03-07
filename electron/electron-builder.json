@@ -1,7 +1,6 @@
 {
   "npmRebuild": false,
   "nodeGypRebuild": true,
-  "publish": null,
   "files": [
     "lib",
     "build/**/*.node",
@@ -34,6 +33,9 @@
   "linux": {
     "icon": "assets/iconset"
   },
+  "publish": [{
+    "provider": "github"
+  }],
   "deb": {
     "depends": [
       "gconf2",
