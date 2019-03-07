@@ -57,24 +57,13 @@ then
 fi
 
 
-if [ "$ARGV_TARGET_OPERATING_SYSTEM" == "darwin" ]; then
-  chown -RL resin:staff app-git
-  su resin -c "$HERE/../shared/npm-install.sh \
-    -b \"$ARGV_BASE_DIRECTORY\" \
-    -r \"$ARGV_ARCHITECTURE\" \
-    -t electron \
-    -s \"$ARGV_TARGET_OPERATING_SYSTEM\" \
-    -m \"$ARGV_NPM_VERSION\" \
-    -l electron"
-else
-  "$HERE/../shared/npm-install.sh" \
-    -b "$ARGV_BASE_DIRECTORY" \
-    -r "$ARGV_ARCHITECTURE" \
-    -t electron \
-    -s "$ARGV_TARGET_OPERATING_SYSTEM" \
-    -m "$ARGV_NPM_VERSION" \
-    -l electron
-fi
+"$HERE/../shared/npm-install.sh" \
+  -b "$ARGV_BASE_DIRECTORY" \
+  -r "$ARGV_ARCHITECTURE" \
+  -t electron \
+  -s "$ARGV_TARGET_OPERATING_SYSTEM" \
+  -m "$ARGV_NPM_VERSION" \
+  -l electron
 "$HERE/../shared/apply-patches.sh" \
   -b "$ARGV_BASE_DIRECTORY"
 "$HERE/../shared/npm-execute-script.sh" \
