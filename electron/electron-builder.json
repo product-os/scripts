@@ -8,21 +8,15 @@
     "node_modules/**/*"
   ],
   "mac": {
-    "icon": "assets/icon.icns",
-    "target": [
-      "zip"
-    ]
+    "icon": "assets/icon.icns"
   },
   "dmg": {
+    "publish": [ "github"],
     "background": "assets/dmg/background.tiff",
     "icon": "assets/icon.icns"
   },
   "win": {
-    "icon": "assets/icon.ico",
-    "target": [
-      "zip",
-      "nsis"
-    ]
+    "icon": "assets/icon.ico"
   },
   "nsis": {
     "oneClick": true,
@@ -31,6 +25,7 @@
     "uninstallerIcon": "assets/icon.ico",
     "deleteAppDataOnUninstall": true,
     "license": "LICENSE",
+    "publish": [ "github" ],
     "artifactName": "${productName}-Setup-${version}-${env.TARGET_ARCH}.${ext}"
   },
   "portable": {
@@ -38,14 +33,11 @@
     "requestExecutionLevel": "user"
   },
   "linux": {
-    "icon": "assets/iconset",
-    "target": [
-      "zip"
-    ]
+    "icon": "assets/iconset"
   },
-  "publish": [{
-    "provider": "github"
-  }],
+  "appImage": {
+    "publish": [ "github" ]
+  },
   "deb": {
     "depends": [
       "gconf2",
