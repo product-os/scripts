@@ -16,7 +16,8 @@
     "icon": "assets/icon.icns"
   },
   "win": {
-    "icon": "assets/icon.ico"
+    "icon": "assets/icon.ico",
+    "target": [ "zip", "nsis" ]
   },
   "nsis": {
     "oneClick": true,
@@ -30,10 +31,17 @@
   },
   "portable": {
     "artifactName": "${productName}-Portable-${version}-${env.TARGET_ARCH}.${ext}",
+    "publish": [ "github" ],
     "requestExecutionLevel": "user"
   },
   "linux": {
-    "icon": "assets/iconset"
+    "icon": "assets/iconset",
+    "target": [
+      "zip",
+      "AppImage",
+      "rpm",
+      "deb"
+    ]
   },
   "appImage": {
     "publish": [ "github" ]
