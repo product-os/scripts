@@ -8,14 +8,21 @@
     "node_modules/**/*"
   ],
   "mac": {
-    "icon": "assets/icon.icns"
+    "icon": "assets/icon.icns",
+    "target": [
+      "zip"
+    ]
   },
   "dmg": {
     "background": "assets/dmg/background.tiff",
     "icon": "assets/icon.icns"
   },
   "win": {
-    "icon": "assets/icon.ico"
+    "icon": "assets/icon.ico",
+    "target": [
+      "zip",
+      "nsis"
+    ]
   },
   "nsis": {
     "oneClick": true,
@@ -31,7 +38,10 @@
     "requestExecutionLevel": "user"
   },
   "linux": {
-    "icon": "assets/iconset"
+    "icon": "assets/iconset",
+    "target": [
+      "zip"
+    ]
   },
   "publish": [{
     "provider": "github"
