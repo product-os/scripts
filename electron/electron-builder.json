@@ -43,7 +43,8 @@
     ]
   },
   "appImage": {
-    "publish": [ "github" ]
+    "publish": [ "github" ],
+    "systemIntegration": "doNotAsk"
   },
   "deb": {
     "depends": [
