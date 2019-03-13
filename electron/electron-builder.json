@@ -1,7 +1,6 @@
 {
   "npmRebuild": false,
   "nodeGypRebuild": true,
-  "publish": null,
   "files": [
     "lib",
     "build/**/*.node",
@@ -12,11 +11,13 @@
     "icon": "assets/icon.icns"
   },
   "dmg": {
+    "publish": [ "github"],
     "background": "assets/dmg/background.tiff",
     "icon": "assets/icon.icns"
   },
   "win": {
-    "icon": "assets/icon.ico"
+    "icon": "assets/icon.ico",
+    "target": [ "zip", "nsis" ]
   },
   "nsis": {
     "oneClick": true,
@@ -25,6 +26,7 @@
     "uninstallerIcon": "assets/icon.ico",
     "deleteAppDataOnUninstall": true,
     "license": "LICENSE",
+    "publish": [ "github" ],
     "artifactName": "${productName}-Setup-${version}-${env.TARGET_ARCH}.${ext}"
   },
   "portable": {
@@ -32,7 +34,17 @@
     "requestExecutionLevel": "user"
   },
   "linux": {
-    "icon": "assets/iconset"
+    "icon": "assets/iconset",
+    "target": [
+      "zip",
+      "AppImage",
+      "rpm",
+      "deb"
+    ]
+  },
+  "appImage": {
+    "publish": [ "github" ],
+    "systemIntegration": "doNotAsk"
   },
   "deb": {
     "depends": [

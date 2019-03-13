@@ -122,14 +122,14 @@ if [ -z ${ANALYTICS_SENTRY_TOKEN-} ]; then
   echo "WARNING: No Sentry token found (ANALYTICS_SENTRY_TOKEN is not set)" 1>&2
 else
   echo "Found ANALYTICS_SENTRY_TOKEN"
-  ELECTRON_BUILDER_OPTIONS+=" --extraMetadata.analytics.sentry.token=${ANALYTICS_SENTRY_TOKEN}"
+  ELECTRON_BUILDER_OPTIONS+=" --c.extraMetadata.analytics.sentry.token=${ANALYTICS_SENTRY_TOKEN}"
 fi
 
 if [ -z ${ANALYTICS_MIXPANEL_TOKEN-} ]; then
   echo "WARNING: No Mixpanel token found (ANALYTICS_MIXPANEL_TOKEN is not set)" 1>&2
 else
   echo "Found ANALYTICS_MIXPANEL_TOKEN"
-  ELECTRON_BUILDER_OPTIONS+=" --extraMetadata.analytics.mixpanel.token=${ANALYTICS_MIXPANEL_TOKEN}"
+  ELECTRON_BUILDER_OPTIONS+=" --c.extraMetadata.analytics.mixpanel.token=${ANALYTICS_MIXPANEL_TOKEN}"
 fi
 
 if [ "$ELECTRON_BUILDER_OS" = "win" ]; then
@@ -152,70 +152,16 @@ else
   ELECTRON_BUILDER_ALLOW_UNRESOLVED_DEPENDENCIES="true"
 fi
 
-# For now we build AppImages in a very custom way due to
-# issues on the electron-builder project
-if [ "$ARGV_PACKAGE_TYPE" = "appimage" ]; then
-  pushd "$ARGV_BASE_DIRECTORY"
-  ELECTRON_BUILDER_ALLOW_UNRESOLVED_DEPENDENCIES="$ELECTRON_BUILDER_ALLOW_UNRESOLVED_DEPENDENCIES" \
-  TARGET_ARCH="$ARGV_ARCHITECTURE" \
-    build --dir "--$ELECTRON_BUILDER_OS" ${ELECTRON_BUILDER_OPTIONS} \
-    "--$ELECTRON_BUILDER_ARCHITECTURE" \
-    --config="$ELECTRON_BUILDER_CONFIG" \
-    --extraMetadata.name="$APPLICATION_NAME" \
-    --extraMetadata.version="$APPLICATION_VERSION" \
-    --extraMetadata.packageType="$ARGV_PACKAGE_TYPE"
-  popd
-
-  PRODUCT_NAME="$("$HERE/../shared/resinci-read.sh" \
-    -b "$ARGV_BASE_DIRECTORY" \
-    -p "builder.productName" \
-    -l electron)"
-  APPLICATION_DESCRIPTION="$(jq -r '.description' "$PACKAGE_JSON")"
-  APPIMAGE_ARCHITECTURE="$("$HERE/../shared/architecture-convert.sh" -r "$ARGV_ARCHITECTURE" -t appimage)"
-  ELECTRON_BUILDER_ARCHITECTURE="$("$HERE/../shared/architecture-convert.sh" -r "$ARGV_ARCHITECTURE" -t electron-builder)"
-  BUILD_DIRECTORY="$ARGV_BASE_DIRECTORY/dist"
-
-  APPDIR_PATH="$BUILD_DIRECTORY/$APPLICATION_NAME-$APPLICATION_VERSION-linux.AppDir"
-  APPIMAGE_PATH="$BUILD_DIRECTORY/$APPLICATION_NAME-$APPLICATION_VERSION-$APPIMAGE_ARCHITECTURE.AppImage"
-  APPIMAGE_ZIP_PATH="$BUILD_DIRECTORY/$APPLICATION_NAME-$APPLICATION_VERSION-linux-$ELECTRON_BUILDER_ARCHITECTURE.zip"
-
-  if [ "$ARGV_ARCHITECTURE" = "x64" ]; then
-    ELECTRON_BUILDER_LINUX_UNPACKED_DIRECTORY="linux-unpacked"
-  else
-    ELECTRON_BUILDER_LINUX_UNPACKED_DIRECTORY="linux-$ELECTRON_BUILDER_ARCHITECTURE-unpacked"
-  fi
-
-  "$HERE/electron-create-appdir.sh" \
-    -n "$PRODUCT_NAME" \
-    -d "$APPLICATION_DESCRIPTION" \
-    -p "$BUILD_DIRECTORY/$ELECTRON_BUILDER_LINUX_UNPACKED_DIRECTORY" \
-    -r "$ARGV_ARCHITECTURE" \
-    -b "$APPLICATION_NAME" \
-    -i "$ARGV_BASE_DIRECTORY/assets/icon.png" \
-    -o "$APPDIR_PATH"
-
-  "$HERE/electron-create-appimage.sh" \
-    -d "$APPDIR_PATH" \
-    -r "$ARGV_ARCHITECTURE" \
-    -w "$ARGV_TEMPORARY_DIRECTORY" \
-    -o "$APPIMAGE_PATH"
-
-  "$HERE/../shared/zip-file.sh" \
-    -f "$APPIMAGE_PATH" \
-    -s linux \
-    -o "$APPIMAGE_ZIP_PATH"
-else
-  pushd "$ARGV_BASE_DIRECTORY"
-  ELECTRON_BUILDER_ALLOW_UNRESOLVED_DEPENDENCIES="$ELECTRON_BUILDER_ALLOW_UNRESOLVED_DEPENDENCIES" \
-  TARGET_ARCH="$ARGV_ARCHITECTURE" \
-    build "--$ELECTRON_BUILDER_OS" "$ARGV_PACKAGE_TYPE" ${ELECTRON_BUILDER_OPTIONS} \
-    "--$ELECTRON_BUILDER_ARCHITECTURE" \
-    --config="$ELECTRON_BUILDER_CONFIG" \
-    --extraMetadata.name="$APPLICATION_NAME" \
-    --extraMetadata.version="$APPLICATION_VERSION" \
-    --extraMetadata.packageType="$ARGV_PACKAGE_TYPE"
-  popd
-fi
+pushd "$ARGV_BASE_DIRECTORY"
+ELECTRON_BUILDER_ALLOW_UNRESOLVED_DEPENDENCIES="$ELECTRON_BUILDER_ALLOW_UNRESOLVED_DEPENDENCIES" \
+TARGET_ARCH="$ARGV_ARCHITECTURE" \
+  npx build "--$ELECTRON_BUILDER_OS" "$ARGV_PACKAGE_TYPE" ${ELECTRON_BUILDER_OPTIONS} \
+  "--$ELECTRON_BUILDER_ARCHITECTURE" \
+  --config="$ELECTRON_BUILDER_CONFIG" \
+  --c.extraMetadata.name="$APPLICATION_NAME" \
+  --c.extraMetadata.version="$APPLICATION_VERSION" \
+  --c.extraMetadata.packageType="$ARGV_PACKAGE_TYPE"
+popd
 
 rm "$ELECTRON_BUILDER_CONFIG"
 
