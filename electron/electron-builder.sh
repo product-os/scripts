@@ -23,7 +23,6 @@ HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 "$HERE/../shared/check-dependency.sh" jq
 "$HERE/../shared/check-dependency.sh" node
-"$HERE/../shared/check-dependency.sh" build
 
 usage () {
   echo "Usage: $0" 1>&2
