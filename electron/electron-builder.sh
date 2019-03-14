@@ -21,10 +21,6 @@ set -e
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-"$HERE/../shared/check-dependency.sh" jq
-"$HERE/../shared/check-dependency.sh" node
-"$HERE/../shared/check-dependency.sh" build
-
 usage () {
   echo "Usage: $0" 1>&2
   echo "" 1>&2
@@ -66,6 +62,11 @@ if [ -z "$ARGV_BASE_DIRECTORY" ] \
   || [ -z "$ARGV_NPM_DATA_DIRECTORY" ]; then
   usage
 fi
+
+PATH=$ARGV_BASE_DIRECTORY/node_modules/.bin/:$PATH
+"$HERE/../shared/check-dependency.sh" jq
+"$HERE/../shared/check-dependency.sh" node
+"$HERE/../shared/check-dependency.sh" build
 
 # Setup scoped npm prefix and cache directories
 export npm_config_prefix="$ARGV_NPM_DATA_DIRECTORY/npm"
