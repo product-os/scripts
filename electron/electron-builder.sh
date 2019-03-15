@@ -21,10 +21,6 @@ set -e
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-"$HERE/../shared/check-dependency.sh" jq
-"$HERE/../shared/check-dependency.sh" node
-"$HERE/../shared/check-dependency.sh" build
-
 usage () {
   echo "Usage: $0" 1>&2
   echo "" 1>&2
@@ -66,6 +62,11 @@ if [ -z "$ARGV_BASE_DIRECTORY" ] \
   || [ -z "$ARGV_NPM_DATA_DIRECTORY" ]; then
   usage
 fi
+
+PATH=$ARGV_BASE_DIRECTORY/node_modules/.bin/:$PATH
+"$HERE/../shared/check-dependency.sh" jq
+"$HERE/../shared/check-dependency.sh" node
+"$HERE/../shared/check-dependency.sh" build
 
 # Setup scoped npm prefix and cache directories
 export npm_config_prefix="$ARGV_NPM_DATA_DIRECTORY/npm"
@@ -132,20 +133,6 @@ else
   ELECTRON_BUILDER_OPTIONS+=" --c.extraMetadata.analytics.mixpanel.token=${ANALYTICS_MIXPANEL_TOKEN}"
 fi
 
-if [ "$ELECTRON_BUILDER_OS" = "win" ]; then
-  # Export the path that's added by running
-  # C:\Program Files (x86)\Microsoft Visual C++ Build Tools\vcbuildtools.bat
-  # on the windows node. This should allow us to find signtool.exe
-  # in /c/Program\ Files\ \(x86\)/Windows\ Kits/10/bin/x86
-  NEW_PATH="/c/Program Files (x86)/MSBuild/14.0/bin"
-  NEW_PATH+=":/c/Program Files (x86)/Microsoft Visual Studio 14.0/VC/BIN"
-  NEW_PATH+=":/c/Windows/Microsoft.Net/Framework/v4.0.30319"
-  NEW_PATH+=":/c/Windows/Microsoft.Net/Framework"
-  NEW_PATH+=":/c/Program Files (x86)/Windows Kits/10/bin/x86"
-  NEW_PATH+=":/c/Program Files (x86)/Microsoft SDKs/Windows/v10.0A/bin/NETFX 4.6.1 Tools"
-  export PATH="$NEW_PATH:$PATH"
-fi
-
 if [ -z ${ELECTRON_BUILDER_ALLOW_UNRESOLVED_DEPENDENCIES-} ]; then
   ELECTRON_BUILDER_ALLOW_UNRESOLVED_DEPENDENCIES=${ELECTRON_BUILDER_ALLOW_UNRESOLVED_DEPENDENCIES-}
 else
@@ -155,7 +142,7 @@ fi
 pushd "$ARGV_BASE_DIRECTORY"
 ELECTRON_BUILDER_ALLOW_UNRESOLVED_DEPENDENCIES="$ELECTRON_BUILDER_ALLOW_UNRESOLVED_DEPENDENCIES" \
 TARGET_ARCH="$ARGV_ARCHITECTURE" \
-  npx build "--$ELECTRON_BUILDER_OS" "$ARGV_PACKAGE_TYPE" ${ELECTRON_BUILDER_OPTIONS} \
+  build "--$ELECTRON_BUILDER_OS" "$ARGV_PACKAGE_TYPE" ${ELECTRON_BUILDER_OPTIONS} \
   "--$ELECTRON_BUILDER_ARCHITECTURE" \
   --config="$ELECTRON_BUILDER_CONFIG" \
   --c.extraMetadata.name="$APPLICATION_NAME" \

@@ -68,7 +68,7 @@ if [ "$ARGV_TARGET_OPERATING_SYSTEM" = "linux" ]; then
   TARGETS="deb rpm appimage"
 elif [ "$ARGV_TARGET_OPERATING_SYSTEM" = "darwin" ]; then
   TARGETS="dmg zip"
-elif [ "$ARGV_TARGET_OPERATING_SYSTEM" = "windows" ]; then
+elif [ "$ARGV_TARGET_OPERATING_SYSTEM" = "win32" ]; then
   TARGETS="nsis portable"
 fi
 
