@@ -62,6 +62,3 @@ else
     -b "$ARGV_BASE_DIRECTORY" \
     -s concourse-test-electron
 fi
-
-"$HERE/../shared/sanity-checks.sh" \
-  -b "$ARGV_BASE_DIRECTORY"
