@@ -64,8 +64,22 @@ fi
   -s "$ARGV_TARGET_OPERATING_SYSTEM" \
   -m "$ARGV_NPM_VERSION" \
   -l electron
+
 "$HERE/../shared/apply-patches.sh" \
   -b "$ARGV_BASE_DIRECTORY"
+
+"$HERE/../shared/sanity-checks.sh" \
+  -b "$ARGV_BASE_DIRECTORY"
+
+# run npm install a second time to install optional dependencies
+"$HERE/../shared/npm-install.sh" \
+  -b "$ARGV_BASE_DIRECTORY" \
+  -r "$ARGV_ARCHITECTURE" \
+  -t electron \
+  -s "$ARGV_TARGET_OPERATING_SYSTEM" \
+  -m "$ARGV_NPM_VERSION" \
+  -l electron
+
 "$HERE/../shared/npm-execute-script.sh" \
   -b "$ARGV_BASE_DIRECTORY" \
   -s concourse-build-electron \

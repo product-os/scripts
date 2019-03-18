@@ -86,8 +86,3 @@ for target in $TARGETS; do
     -w "$ARGV_TEMPORARY_DIRECTORY" \
     -n "$ARGV_NPM_DATA_DIRECTORY"
 done
-
-find $(pwd)/app-git/dist \
-  -type f \
-  -maxdepth 1 \
-  -exec cp {} $(pwd)/dist-${ARGV_TARGET_OPERATING_SYSTEM}-${ARGV_ARCHITECTURE}/ \;
