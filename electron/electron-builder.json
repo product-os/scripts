@@ -44,6 +44,7 @@
   },
   "appImage": {
     "publish": [ "github" ],
+    "artifactName": "${productName}-${version}.${ext}",
     "systemIntegration": "doNotAsk"
   },
   "deb": {
