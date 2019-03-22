@@ -54,8 +54,17 @@ if [ -z $NPM_VERSION ]; then
 else
   npx npm@$NPM_VERSION shrinkwrap --dev
 fi
+# We want to ignore the version bump in npm-shrinkwrap that happens on the CI
+oldShrink=$(git show HEAD:${SHRINKWRAP_FILE} | jq "del(.version)")
+newShrink=$(jq "del(.version)" ${SHRINKWRAP_FILE})
 
-if [ -n "$(git status -s "$SHRINKWRAP_FILE")" ]; then
+echo "$oldShrink" > shrinkwrap.old.tmp
+echo "$newShrink" > shrinkwrap.new.tmp
+DIFF=$(diff shrinkwrap.old.tmp shrinkwrap.new.tmp)
+rm shrinkwrap.old.tmp
+rm shrinkwrap.new.tmp
+
+if [ "${DIFF}" != "" ]; then
   echo "There are unstaged $SHRINKWRAP_FILE changes. Please commit the result of:" 1>&2
   echo "" 1>&2
   echo "    npm shrinkwrap --dev" 1>&2
