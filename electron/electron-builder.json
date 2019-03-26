@@ -36,7 +36,6 @@
   "linux": {
     "icon": "assets/iconset",
     "target": [
-      "zip",
       "AppImage",
       "rpm",
       "deb"
@@ -44,7 +43,7 @@
   },
   "appImage": {
     "publish": [ "github" ],
-    "artifactName": "${productName}-${version}.${ext}",
+    "artifactName": "${productName}-${version}-${env.ELECTRON_BUILDER_ARCHITECTURE}.${ext}",
     "systemIntegration": "doNotAsk"
   },
   "deb": {
