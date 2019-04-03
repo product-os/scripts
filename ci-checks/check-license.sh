@@ -13,9 +13,7 @@ if ls license*; then
   echo "Found file 'license*'" 1>&2
   apk add --no-cache grep > /dev/null
   echo "Running regex test" 1>&2
+  # Only fail if license is present but not one of the specified ones
   /usr/bin/egrep -zoi '(apache.*2.0|affero general public license)' license*
   exit
 fi
-
-echo "License is missing or not valid."
-echo "Valid licenses are Apache 2.0 and Affero GPL"
