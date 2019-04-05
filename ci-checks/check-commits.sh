@@ -14,16 +14,6 @@ if echo "$author" | /usr/bin/egrep -zoi 'resin-io(-\w+)?-versionbot'; then
   exit 0
 fi
 
-pushd resin-commit-lint > /dev/null
-npm install > /dev/null 2>&1
-npm link > /dev/null 2>&1
-popd > /dev/null
-
-pushd find-commits > /dev/null
-npm install > /dev/null 2>&1
-npm link > /dev/null 2>&1
-popd > /dev/null
-
 pushd ${ARGV_DIRECTORY} > /dev/null
 
 > lint_report.txt
