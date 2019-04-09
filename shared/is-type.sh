@@ -10,4 +10,4 @@ set -u
 pushd ${ARGV_DIRECTORY}
 detectorist .
 
-echo "ARGV_TYPE"
+echo "${ARGV_TYPE}"
