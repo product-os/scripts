@@ -21,7 +21,6 @@ FAILED="false"
 # File separator set to \n. N.B. This will be valid for the whole script
 IFS=$'\n'
 
-baseBranch=$(jq -r '.base_branch' .git/.version)
 baseRepo=$(jq -r '.base_repo' .git/.version)
 baseOrg=$(jq -r '.base_org' .git/.version)
 number=$(jq -r '.number' .git/.version)
