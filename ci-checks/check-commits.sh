@@ -21,13 +21,12 @@ FAILED="false"
 # File separator set to \n. N.B. This will be valid for the whole script
 IFS=$'\n'
 
-baseBranch=$(jq -r '.base_branch' .git/.version)
 baseRepo=$(jq -r '.base_repo' .git/.version)
 baseOrg=$(jq -r '.base_org' .git/.version)
 number=$(jq -r '.number' .git/.version)
 
 # Show all commits on the current branch that are not on master
-for SHA in $(find-commits pr --owner=$baseOrg --repo=$baseRepo --number=$number); do
+for SHA in $(find-commits sha --owner=$baseOrg --repo=$baseRepo --number=$number); do
   # Show commit body
   body=$(git show $SHA -s --format=%B)
 
