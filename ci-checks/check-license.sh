@@ -8,6 +8,12 @@ set -u
 
 pushd source
 
+uri=$(jq -r '.uri' .git/.version)
+isFork=$(scrutinizer remote ${uri} | jq -r '.fork')
+
+# If repo is a fork it might have a different license we can't change
+[[ $isFork == "true" ]] && exit 0
+
 shopt -s nocaseglob
 if ls license*; then
   echo "Found file 'license*'" 1>&2
