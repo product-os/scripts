@@ -18,6 +18,7 @@
 
 set -u
 set -e
+set -x
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 

@@ -18,6 +18,7 @@
 
 set -e
 set -u
+set -x
 
 usage () {
   echo "Usage: $0" 1>&2
