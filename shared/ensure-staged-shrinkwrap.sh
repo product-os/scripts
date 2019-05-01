@@ -24,19 +24,22 @@ usage () {
   echo "Options" 1>&2
   echo "" 1>&2
   echo "    -b <base project directory>" 1>&2
+  echo "    -m <npm version>" 1>&2
   exit 1
 }
 
 ARGV_BASE_DIRECTORY=""
+ARGV_NPM_VERSION=""
 
-while getopts ":b:" option; do
+while getopts ":b:m:" option; do
   case $option in
     b) ARGV_BASE_DIRECTORY=$OPTARG ;;
+    m) ARGV_NPM_VERSION=$OPTARG ;;
     *) usage ;;
   esac
 done
 
-if [ -z "$ARGV_BASE_DIRECTORY" ]; then
+if [ -z "$ARGV_BASE_DIRECTORY" ] || [ -z "$ARGV_NPM_VERSION" ]; then
   usage
 fi
 
@@ -52,7 +55,7 @@ cd "$ARGV_BASE_DIRECTORY"
 if [ -z $NPM_VERSION ]; then
   npm shrinkwrap --dev
 else
-  npx npm@$NPM_VERSION shrinkwrap --dev
+  npx "npm@$ARGV_NPM_VERSION" shrinkwrap --dev
 fi
 # We want to ignore the version bump in npm-shrinkwrap that happens on the CI
 oldShrink=$(git show HEAD:${SHRINKWRAP_FILE} | jq "del(.version)")
