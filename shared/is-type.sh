@@ -8,6 +8,6 @@ set -u
 
 pushd source
 
-IS_TYPE=$(detectorist . | jq -r ".${ARGV_TYPE}")
+IS_TYPE=$(detectorist . | jq -r ".\"${ARGV_TYPE}\"")
 
 [[ $IS_TYPE == "true" ]]
