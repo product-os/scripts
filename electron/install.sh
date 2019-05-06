@@ -69,7 +69,8 @@ fi
   -b "$ARGV_BASE_DIRECTORY"
 
 "$HERE/../shared/sanity-checks.sh" \
-  -b "$ARGV_BASE_DIRECTORY"
+  -b "$ARGV_BASE_DIRECTORY" \
+  -m "$ARGV_NPM_VERSION"
 
 # run npm install a second time to install optional dependencies
 "$HERE/../shared/npm-install.sh" \

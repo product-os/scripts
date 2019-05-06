@@ -25,19 +25,22 @@ usage () {
   echo "Options" 1>&2
   echo "" 1>&2
   echo "    -b <base project directory>" 1>&2
+  echo "    -m <npm version>" 1>&2
   exit 1
 }
 
 ARGV_BASE_DIRECTORY=""
+ARGV_NPM_VERSION=""
 
-while getopts ":b:" option; do
+while getopts ":b:m:" option; do
   case $option in
     b) ARGV_BASE_DIRECTORY=$OPTARG ;;
+    m) ARGV_NPM_VERSION=$OPTARG ;;
     *) usage ;;
   esac
 done
 
-if [ -z "$ARGV_BASE_DIRECTORY" ]; then
+if [ -z "$ARGV_BASE_DIRECTORY" ] || [ -z "$ARGV_NPM_VERSION" ]; then
   usage
 fi
 
@@ -46,4 +49,4 @@ cd "$ARGV_BASE_DIRECTORY"
 # This command will exit with an error code if there
 # are invalid or extraneous dependencies, printing the
 # problematic ones if so.
-npx npm@$NPM_VERSION ls >/dev/null
+npx "npm@$ARGV_NPM_VERSION" ls >/dev/null
