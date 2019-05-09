@@ -81,6 +81,9 @@ fi
   -m "$ARGV_NPM_VERSION" \
   -l electron
 
+"$HERE/../shared/sanity-checks.sh" \
+  -b "$ARGV_BASE_DIRECTORY"
+
 "$HERE/../shared/npm-execute-script.sh" \
   -b "$ARGV_BASE_DIRECTORY" \
   -s concourse-build-electron \
