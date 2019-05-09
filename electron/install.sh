@@ -82,7 +82,8 @@ fi
   -l electron
 
 "$HERE/../shared/sanity-checks.sh" \
-  -b "$ARGV_BASE_DIRECTORY"
+  -b "$ARGV_BASE_DIRECTORY" \
+  -m "$ARGV_NPM_VERSION"
 
 "$HERE/../shared/npm-execute-script.sh" \
   -b "$ARGV_BASE_DIRECTORY" \
