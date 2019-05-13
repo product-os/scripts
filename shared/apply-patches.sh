@@ -62,11 +62,13 @@ if [ -d "$PATCHES_DIRECTORY" ]; then
     else
       echo "Applying $PATCHES_DIRECTORY/$file to $ARGV_DESTINATION_DIRECTORY"
       patch \
+        --silent \
         --force \
         --directory="$ARGV_DESTINATION_DIRECTORY" \
         --ignore-whitespace \
         --strip=1 \
-        --input="$PATCHES_DIRECTORY/$file"
+        --input="$PATCHES_DIRECTORY/$file" \
+      || echo "Ignoring $PATCHES_DIRECTORY/$file, patch already applied"
     fi
   done
 fi
