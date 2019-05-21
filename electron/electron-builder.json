@@ -1,5 +1,5 @@
 {
-  "npmRebuild": false,
+  "npmRebuild": true,
   "nodeGypRebuild": true,
   "files": [
     "lib",
@@ -27,10 +27,10 @@
     "deleteAppDataOnUninstall": true,
     "license": "LICENSE",
     "publish": [ "github" ],
-    "artifactName": "${productName}-Setup-${version}-${env.TARGET_ARCH}.${ext}"
+    "artifactName": "${productName}-Setup-${version}.${ext}"
   },
   "portable": {
-    "artifactName": "${productName}-Portable-${version}-${env.TARGET_ARCH}.${ext}",
+    "artifactName": "${productName}-Portable-${version}.${ext}",
     "requestExecutionLevel": "user"
   },
   "linux": {
