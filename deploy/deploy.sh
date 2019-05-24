@@ -48,5 +48,8 @@ npm link > /dev/null 2>&1
 popd > /dev/null
 pushd $ARGV_DIRECTORY
 
+echo "Should deploy"
+cat $keyframe
+echo "Skipping deploy"
 # Deploy with katapult
-katapult deploy -t kubernetes -e staging -c . -v -k "$keyframe"
+# katapult deploy -t kubernetes -e staging -c . -v -k "$keyframe"
