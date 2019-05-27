@@ -56,19 +56,18 @@ fi
 PATCHES_DIRECTORY="$ARGV_BASE_DIRECTORY/patches"
 
 if [ -d "$PATCHES_DIRECTORY" ]; then
-  for file in $(ls "$PATCHES_DIRECTORY"); do
-    if [ ! -f "$PATCHES_DIRECTORY/$file" ]; then
-      echo "Ignoring $PATCHES_DIRECTORY/$file, not a file"
+  for file in "$PATCHES_DIRECTORY"/*; do
+    if [ ! -f "$file" ]; then
+      echo "Ignoring $file, not a file"
     else
-      echo "Applying $PATCHES_DIRECTORY/$file to $ARGV_DESTINATION_DIRECTORY"
+      echo "Applying $file to $ARGV_DESTINATION_DIRECTORY"
       patch \
         --silent \
         --force \
         --directory="$ARGV_DESTINATION_DIRECTORY" \
         --ignore-whitespace \
         --strip=1 \
-        --input="$PATCHES_DIRECTORY/$file" \
-      || echo "Ignoring $PATCHES_DIRECTORY/$file, patch already applied"
+        --input="$file" || echo "Ignoring $file, patch already applied"
     fi
   done
 fi
