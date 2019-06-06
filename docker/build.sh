@@ -51,11 +51,9 @@ function build() {
 
   [[ "${publish}" == "false" ]] && return
 
-  {{#unless sandbox}}
   docker push ${DOCKER_IMAGE}:${sha}
   docker tag ${DOCKER_IMAGE}:${sha} ${DOCKER_IMAGE}:${branch}
   docker push ${DOCKER_IMAGE}:${branch}
-  {{/unless}}
 }
 
 # Read the details of what we should build from .resinci.yml
