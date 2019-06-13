@@ -19,6 +19,7 @@ pushd $ARGV_DIRECTORY
 
 sha=$(git rev-parse HEAD)
 branch=$(cat .git/.version | jq -r '.head_branch')
+branch=${branch//[^a-zA-Z0-9_-]/-}
 
 function build() {
   path=$1; shift
