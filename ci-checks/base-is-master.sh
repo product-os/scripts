@@ -18,6 +18,6 @@ number=$(jq -r '.number' .git/.version)
 # Otherwise we check if a Backport footer exists, and fail if not
 COMMITS=$(find-commits parsed -r ${baseRepo} -o ${baseOrg} -n ${number})
 
-IS_BACKPORT_COMMIT=$(echo ${COMMITS} | jq -c '[.[].footers] | add' | jq 'map(select(. | startswith("Backport-to:"))) | length > 0)')
+IS_BACKPORT_COMMIT=$(echo ${COMMITS} | jq -c '[.[].footers] | add' | jq 'map(select(. | startswith("Backport-to:"))) | length > 0')
 
 [[ ${IS_BACKPORT_COMMIT} == "true" ]]
