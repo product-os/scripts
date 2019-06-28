@@ -21,11 +21,13 @@ sha=$(git rev-parse HEAD)
 branch=$(cat .git/.version | jq -r '.head_branch')
 branch=${branch//[^a-zA-Z0-9_-]/-}
 
+
 function build() {
   path=$1; shift
   DOCKERFILE=$1; shift
   DOCKER_IMAGE=$1; shift
   publish=$1; shift
+  args=$1; shift
 
   (
     cd $path
@@ -41,6 +43,7 @@ function build() {
       --cache-from ${DOCKER_IMAGE}:${sha} \
       --cache-from ${DOCKER_IMAGE}:${branch} \
       --cache-from ${DOCKER_IMAGE}:master \
+      ${args} \
       --build-arg RESINCI_REPO_COMMIT=${sha} \
       --build-arg CI=true \
       -t ${DOCKER_IMAGE}:${sha} \
@@ -71,8 +74,9 @@ if [ -n "$builds" ]; then
     dockerfile=$((echo ${build} | jq -r '.dockerfile') || echo Dockerfile)
     path=$((echo ${build} | jq -r '.path') || echo .)
     publish=$((echo ${build} | jq -r '.publish') || echo true)
+    args=$((echo ${build} | jq -r '.args // [] | map("--build-arg " + .) | join(" ")') || echo "")
 
-    build "$path" "$dockerfile" "$repo" "$publish"
+    build "$path" "$dockerfile" "$repo" "$publish" "$args"
   done
 else
   if [ -f .resinci.yml ]; then
