@@ -85,7 +85,7 @@ else
     publish=true
   fi
 
-  build . Dockerfile $(cat .git/.version | jq -r '.base_org + "/" + .base_repo') $publish
+  build . Dockerfile $(cat .git/.version | jq -r '.base_org + "/" + .base_repo') $publish ""
 fi
 
 # Ensure we explicitly exit so we catch the signal and shut down
