@@ -14,4 +14,5 @@ repo=$(jq -r '.base_repo' .git/.version)
 [[ "${repo}" == "landr" ]] || exit 0
 [[ "${org}" == "balena-io" ]] || exit 0
 
+tree dist
 npm install -g landr && landr
