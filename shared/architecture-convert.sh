@@ -52,7 +52,7 @@ if [ "$ARGV_TYPE" == "node" ]; then
   elif [ "$ARGV_ARCHITECTURE" == "x64" ]; then
     RESULT=x64
   elif [ "$ARGV_ARCHITECTURE" == "armv7hf" ]; then
-    RESULT=arm
+    RESULT=armv7l
   elif [ "$ARGV_ARCHITECTURE" == "aarch64" ]; then
     RESULT=arm64
   fi
