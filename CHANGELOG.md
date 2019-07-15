@@ -72,7 +72,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ## (2019-05-24)
 
 * Skip katapult deploy [Giovanni Garufi]
-* Add deploy, shoud deploy and keyframes scripts [Giovanni Garufi]
+* Add deploy, should deploy and keyframes scripts [Giovanni Garufi]
 
 # v1.7.0
 ## (2019-05-21)
