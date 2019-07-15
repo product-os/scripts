@@ -12,7 +12,7 @@ baseRepo=$(jq -r '.base_repo' .git/.version)
 baseOrg=$(jq -r '.base_org' .git/.version)
 number=$(jq -r '.number' .git/.version)
 
-# If the PR is targetting master then we exit with success
+# If the PR is targeting master then we exit with success
 [[ "${base}" == "master" ]] && exit 0
 
 # Otherwise we check if a Backport footer exists, and fail if not
