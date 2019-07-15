@@ -73,35 +73,69 @@ if [ "$ARGV_TARGET_OPERATING_SYSTEM" == "windows" ]; then
   function cleanup {
     EXIT_CODE=$?
     [[ -d /c/Users/${user}/.node-gyp-$$ ]] && rm -rf /c/Users/${user}/.node-gyp-$$
+    [[ -d $BUILD_TMP ]] && rm -rf $BUILD_TMP
     exit $EXIT_CODE
   }
+
+  export BUILD_TMP=$(mktemp -d -p "/c")
 
   trap cleanup EXIT
   export NODE_GYP_DIR="/c/Users/${user}/.node-gyp-$$"
 fi
 
-"$HERE/../shared/task-start.sh" \
-  -b $(pwd)/versioned-source \
-  -l node-cli
 
 # Install dependencies
 if [ "$ARGV_TARGET_OPERATING_SYSTEM" == "darwin" ]; then
+  export OSX_KEYCHAIN='/Users/resin/Library/Keychains/pkgbuild-keychain-db'
   export NVM_DIR=/usr/local/nvm
   export NODE_VERSION=v10.16.0
   export npm_config_cache="$NVM_DIR/npm-cache"
-  mkdir -p "$npm_config_cache"
   set +x
   . "$NVM_DIR/nvm.sh"
-  nvm install $NODE_VERSION
   nvm use $NODE_VERSION
   set -x
   src=$(readlink versioned-source) # resolve 'versioned-source' if it is a symlink
-  chown -R resin:staff "${src:-versioned-source}" /Users/resin/.balena
-  chown -R resin:admin "$npm_config_cache"
+  chown -R resin:staff "${src:-versioned-source}" /Users/resin/.pkg-cache /Users/resin/.balena
+  chmod -R 775 /Users/resin/.pkg-cache
 fi
 
 pushd versioned-source
 print_status
 
 run_as npx npm@6.9.0 install
-run_as npm test
+run_as npm run package
+
+if [ "$ARGV_TARGET_OPERATING_SYSTEM" == "darwin" ]; then
+nvm deactivate
+print_status
+fi
+
+ASSET=$(find $(pwd)/dist -type f)
+
+popd
+pushd resinci-deploy
+
+npm install --unsafe-perm > /dev/null
+npm link > /dev/null
+
+popd
+pushd versioned-source
+
+headBranch=$(jq -r '.head_branch' .git/.version)
+org=$(jq -r '.base_org' .git/.version)
+repo=$(jq -r '.base_repo' .git/.version)
+version=$(jq -r '.componentVersion' .git/.version)
+
+echo $headBranch
+echo $org
+echo $repo
+echo $version
+
+echo "Publishing asset"
+echo $ASSET
+
+resinci-deploy store github-release $ASSET \
+  --branch=$headBranch \
+  --owner=$org \
+  --repo=$repo \
+  --version=$version
