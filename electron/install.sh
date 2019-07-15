@@ -30,6 +30,7 @@ usage () {
   echo "    -r <architecture>" 1>&2
   echo "    -s <target operating system>" 1>&2
   echo "    -m <npm version>" 1>&2
+  echo "    -c" 1>&2
   exit 1
 }
 
@@ -37,13 +38,15 @@ ARGV_BASE_DIRECTORY=""
 ARGV_ARCHITECTURE=""
 ARGV_TARGET_OPERATING_SYSTEM=""
 ARGV_NPM_VERSION=""
+ARGV_SKIP_CONCOURSE_BUILD_ELECTRON=false
 
-while getopts ":b:r:s:m:" option; do
+while getopts ":b:r:s:m:c" option; do
   case $option in
     b) ARGV_BASE_DIRECTORY=$OPTARG ;;
     r) ARGV_ARCHITECTURE=$OPTARG ;;
     s) ARGV_TARGET_OPERATING_SYSTEM=$OPTARG ;;
     m) ARGV_NPM_VERSION=$OPTARG ;;
+    c) ARGV_SKIP_CONCOURSE_BUILD_ELECTRON=true ;;
     *) usage ;;
   esac
 done
@@ -85,7 +88,10 @@ fi
   -b "$ARGV_BASE_DIRECTORY" \
   -m "$ARGV_NPM_VERSION"
 
-"$HERE/../shared/npm-execute-script.sh" \
-  -b "$ARGV_BASE_DIRECTORY" \
-  -s concourse-build-electron \
-  -o
+if [ "$ARGV_SKIP_CONCOURSE_BUILD_ELECTRON" != true ]
+then
+  "$HERE/../shared/npm-execute-script.sh" \
+    -b "$ARGV_BASE_DIRECTORY" \
+    -s concourse-build-electron \
+    -o
+fi
