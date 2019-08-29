@@ -8,6 +8,11 @@ set -u
 
 [[ "${DEBUG}" == "false" ]] || set -x
 
+pushd resinci-deploy
+npm install
+npm link
+popd
+
 pushd $ARGV_DIRECTORY
 
 headBranch=$(jq -r '.head_branch' .git/.version)
@@ -15,7 +20,7 @@ org=$(jq -r '.base_org' .git/.version)
 repo=$(jq -r '.base_repo' .git/.version)
 version=$(jq -r '.componentVersion' .git/.version)
 
-resinci-deploy store github-release $ASSET \
+resinci-deploy store github-release $ASSETS \
   --branch=$headBranch \
   --owner=$org \
   --repo=$repo \

@@ -15,4 +15,4 @@ pushd $ARGV_DIRECTORY
 
 ./build-docker.sh
 
-cp -r ./deploy/* ../artefacts
+cp ./deploy/* ../artefacts || true
