@@ -20,7 +20,9 @@ pushd $ARGV_DIRECTORY
 sha=$(git rev-parse HEAD)
 branch=$(cat .git/.version | jq -r '.head_branch')
 branch=${branch//[^a-zA-Z0-9_-]/-}
-
+sha="${sha}-test-docker-19"
+branch="${branch}-test-docker-19"
+export DOCKER_BUILDKIT=1
 
 function build() {
   path=$1; shift
@@ -55,7 +57,6 @@ function build() {
 
   [[ "${publish}" == "false" ]] && return
 
-  docker push ${DOCKER_IMAGE}:${sha}
   docker tag ${DOCKER_IMAGE}:${sha} ${DOCKER_IMAGE}:${branch}
   docker push ${DOCKER_IMAGE}:${branch}
 }
