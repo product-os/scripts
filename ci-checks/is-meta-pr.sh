@@ -1,4 +1,7 @@
 #!/bin/bash
+
+echo "TASKINFO: Check if any commit contains a meta tag"
+
 set -e
 ARGV_DIRECTORY="$1"
 set -u

@@ -1,5 +1,7 @@
 #!/bin/bash
 
+echo "TASKINFO: Check if the base branch of the PR is the master branch"
+
 set -e
 ARGV_DIRECTORY="$1"
 set -u
