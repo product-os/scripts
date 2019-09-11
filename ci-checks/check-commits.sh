@@ -1,5 +1,6 @@
 #!/bin/bash
 
+echo "TASKINFO: Check if all the commits in the PR adhere to the guidelines in resin-commit-lint"
 set -e
 ARGV_DIRECTORY="$1"
 set -u

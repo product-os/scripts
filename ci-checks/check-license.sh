@@ -1,5 +1,6 @@
 #!/bin/bash
 
+echo "TASKINFO: Check if the repo has a valid license"
 set -e
 ARGV_DIRECTORY="$1"
 set -u

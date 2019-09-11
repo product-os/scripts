@@ -1,5 +1,7 @@
 #!/bin/bash
 
+echo "TASKINFO: Check if a README exists"
+
 set -e
 ARGV_DIRECTORY="$1"
 set -u
