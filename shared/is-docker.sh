@@ -8,6 +8,11 @@ set -u
 
 pushd ${ARGV_DIRECTORY}
 
+if [[ -f "repo.yml" ]]; then
+  project_type="$(yq read repo.yml 'type')"
+  [[ "$project_type" == "generic" ]] && exit 1
+fi
+
 [[ -f Dockerfile ]] && exit 0
 
 [[ -f .resinci.yml ]] || exit 1
