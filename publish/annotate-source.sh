@@ -6,11 +6,18 @@ set -u
 
 [[ "${DEBUG}" == "false" ]] || set -x
 
+npm install -g detectorist@0.6.0
+
 pushd $ARGV_DIRECTORY
 
 baseBranch=$(jq -r '.base_branch' .git/.version)
 org=$(jq -r '.base_org' .git/.version)
 repo=$(jq -r '.base_repo' .git/.version)
+isDocker=$(detectorist . | jq -r '.docker')
+privateRepo=false
+if curl https://github.com/$org/$repo -I | grep 'Status: 404'; then
+  privateRepo=true
+fi
 
 mergeSHA=$(git rev-parse HEAD)
 
@@ -32,8 +39,11 @@ echo '{}' | jq \
   --arg mergeSha "${mergeSHA}"  \
   --arg parentSha "${parentSHA}"  \
   --arg buildBranch "${buildBranch}"  \
+  --arg isDocker "${isDocker}" \
   --arg oldMaster "${oldMaster}" \
-  '{buildBranch: $buildBranch, parentSha: $parentSha, mergeSha: $mergeSha, oldMaster: $oldMaster }' \
+  --arg privateRepo "${privateRepo}" \
+  '{buildBranch: $buildBranch, parentSha: $parentSha, mergeSha: $mergeSha,
+privateRepo: $privateRepo, languages: { docker: $isDocker }, oldMaster: $oldMaster }' \
   > .git/.versionist
 
 popd
