@@ -1,12 +1,6 @@
 {
   "npmRebuild": true,
   "nodeGypRebuild": true,
-  "files": [
-    "lib",
-    "build/**/*.node",
-    "assets/icon.png",
-    "node_modules/**/*"
-  ],
   "mac": {
     "icon": "assets/icon.icns"
   },
