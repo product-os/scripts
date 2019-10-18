@@ -37,8 +37,7 @@
   },
   "appImage": {
     "publish": [ "github" ],
-    "artifactName": "${productName}-${version}-${env.ELECTRON_BUILDER_ARCHITECTURE}.${ext}",
-    "systemIntegration": "doNotAsk"
+    "artifactName": "${productName}-${version}-${env.ELECTRON_BUILDER_ARCHITECTURE}.${ext}"
   },
   "deb": {
     "depends": [
