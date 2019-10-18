@@ -66,7 +66,7 @@ fi
 PATH=$ARGV_BASE_DIRECTORY/node_modules/.bin/:$PATH
 "$HERE/../shared/check-dependency.sh" jq
 "$HERE/../shared/check-dependency.sh" node
-"$HERE/../shared/check-dependency.sh" build
+"$HERE/../shared/check-dependency.sh" electron-builder
 
 # Setup scoped npm prefix and cache directories
 export npm_config_prefix="$ARGV_NPM_DATA_DIRECTORY/npm"
@@ -149,7 +149,7 @@ fi
 pushd "$ARGV_BASE_DIRECTORY"
 ELECTRON_BUILDER_ARCHITECTURE="$ELECTRON_BUILDER_ARCHITECTURE" \
 ELECTRON_BUILDER_ALLOW_UNRESOLVED_DEPENDENCIES="$ELECTRON_BUILDER_ALLOW_UNRESOLVED_DEPENDENCIES" \
-  build "--$ELECTRON_BUILDER_OS" "$ARGV_PACKAGE_TYPE" ${ELECTRON_BUILDER_OPTIONS} \
+  electron-builder "--$ELECTRON_BUILDER_OS" "$ARGV_PACKAGE_TYPE" ${ELECTRON_BUILDER_OPTIONS} \
   $ARCHITECTURE_FLAGS \
   --config="$ELECTRON_BUILDER_CONFIG" \
   --c.extraMetadata.name="$APPLICATION_NAME" \
