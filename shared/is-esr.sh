@@ -5,7 +5,7 @@ set -e
 ARGV_DIRECTORY="$1"
 
 pushd "$ARGV_DIRECTORY"
-action="$(yq r .git/.version 'action')"
+action="$(jq -r '.action' .git/.version)"
 
 [ -f repo.yml ] || exit 1
 
