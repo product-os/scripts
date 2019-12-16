@@ -4,11 +4,6 @@ set -e
 ARGV_DIRECTORY="$1"
 set -u
 
-pushd find-commits
-npm i
-npm link
-popd
-
 pushd $ARGV_DIRECTORY
 
 if [[ -z "$GITHUB_TOKEN" ]]; then
@@ -19,16 +14,14 @@ fi
 
 baseRepo=$(jq -r '.base_repo' .git/.version)
 baseOrg=$(jq -r '.base_org' .git/.version)
-baseBranch=$(jq -r '.base_branch' .git/.version)
-headBranch=$(jq -r '.head_branch' .git/.version)
 
 COMMITTER_NAME="Balena CI"
 # Find PR to rebase
 pr=$(find-commits candidate --repo ${baseRepo} --owner ${baseOrg})
 echo $pr
 
-CANDIDATE_BASE_BRANCH=$(echo "$pr" | jq -r .data.base.ref)
-CANDIDATE_HEAD_BRANCH=$(echo "$pr" | jq -r .data.head.ref)
+CANDIDATE_BASE_BRANCH=$(echo $pr | jq -r .data.base.ref)
+CANDIDATE_HEAD_BRANCH=$(echo $pr | jq -r .data.head.ref)
 
 git remote set-url origin https://x-access-token:$GITHUB_TOKEN@github.com/$baseOrg/$baseRepo.git
 git config --global user.name "$COMMITTER_NAME"

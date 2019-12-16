@@ -6,8 +6,8 @@ ARGV_DIRECTORY="$1"
 
 pushd "$ARGV_DIRECTORY"
 
-action="$(yq r .git/.version 'action')"
-type="$(yq r .git/.version 'type')"
+action="$(jq -r '.action' .git/.version)"
+type="$(jq -r '.type' .git/.version)"
 
 if [ "$type" == "PullRequestEvent" ]; then
   [[ "${action}" != "merged" ]] && exit 0

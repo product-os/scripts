@@ -6,6 +6,6 @@ ARGV_DIRECTORY="$1"
 
 pushd "$ARGV_DIRECTORY"
 
-type="$(yq r .git/.version 'type')"
+type="$(jq -r '.type' .git/.version)"
 
 [[ "$type" == "VersionEvent" ]]
