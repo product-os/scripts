@@ -15,6 +15,10 @@ fi
 baseRepo=$(jq -r '.base_repo' .git/.version)
 baseOrg=$(jq -r '.base_org' .git/.version)
 
+if [ "$baseRepo" != "jellyfish" ]; then
+	exit 0
+fi
+
 COMMITTER_NAME="Balena CI"
 # Find PR to rebase
 pr=$(find-commits candidate --repo ${baseRepo} --owner ${baseOrg})
