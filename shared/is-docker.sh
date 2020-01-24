@@ -6,6 +6,8 @@ set -u
 
 [[ "${DEBUG}" == "false" ]] || set -x
 
+HERE=$(pwd)
+
 pushd ${ARGV_DIRECTORY}
 
 should_run="$(${HERE}/scripts/shared/resinci-read.sh \
