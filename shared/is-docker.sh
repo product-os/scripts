@@ -8,6 +8,13 @@ set -u
 
 pushd ${ARGV_DIRECTORY}
 
+should_run="$(${HERE}/scripts/shared/resinci-read.sh \
+  -b $(pwd) \
+  -l docker \
+  -p run)"
+
+[[ "${should_run}" == "false" ]] && exit 1
+
 if [[ -f "repo.yml" ]]; then
   project_type="$(yq read repo.yml 'type')"
   [[ "$project_type" == "generic" ]] && exit 1
