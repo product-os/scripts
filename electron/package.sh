@@ -31,7 +31,6 @@ usage () {
   echo "    -s <target operating system>" 1>&2
   echo "    -v <version type (production|prerelease|snapshot)>" 1>&2
   echo "    -n <npm data directory>" 1>&2
-  echo "    -w <temporary directory>" 1>&2
   exit 1
 }
 
@@ -40,7 +39,6 @@ ARGV_ARCHITECTURE=""
 ARGV_TARGET_OPERATING_SYSTEM=""
 ARGV_VERSION_TYPE=""
 ARGV_NPM_DATA_DIRECTORY=""
-ARGV_TEMPORARY_DIRECTORY=""
 
 while getopts ":b:r:s:v:n:w:" option; do
   case $option in
@@ -49,7 +47,6 @@ while getopts ":b:r:s:v:n:w:" option; do
     s) ARGV_TARGET_OPERATING_SYSTEM=$OPTARG ;;
     v) ARGV_VERSION_TYPE=$OPTARG ;;
     n) ARGV_NPM_DATA_DIRECTORY=$OPTARG ;;
-    w) ARGV_TEMPORARY_DIRECTORY=$OPTARG ;;
     *) usage ;;
   esac
 done
@@ -59,7 +56,6 @@ if [ -z "$ARGV_BASE_DIRECTORY" ] \
   || [ -z "$ARGV_TARGET_OPERATING_SYSTEM" ] \
   || [ -z "$ARGV_VERSION_TYPE" ] \
   || [ -z "$ARGV_NPM_DATA_DIRECTORY" ] \
-  || [ -z "$ARGV_TEMPORARY_DIRECTORY" ]
 then
   usage
 fi
@@ -83,6 +79,5 @@ for target in $TARGETS; do
     -r "$ARGV_ARCHITECTURE" \
     -t "$target" \
     -v "$ARGV_VERSION_TYPE" \
-    -w "$ARGV_TEMPORARY_DIRECTORY" \
     -n "$ARGV_NPM_DATA_DIRECTORY"
 done
