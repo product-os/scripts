@@ -55,7 +55,7 @@ if [ -z "$ARGV_BASE_DIRECTORY" ] \
   || [ -z "$ARGV_ARCHITECTURE" ] \
   || [ -z "$ARGV_TARGET_OPERATING_SYSTEM" ] \
   || [ -z "$ARGV_VERSION_TYPE" ] \
-  || [ -z "$ARGV_NPM_DATA_DIRECTORY" ] \
+  || [ -z "$ARGV_NPM_DATA_DIRECTORY" ]
 then
   usage
 fi
