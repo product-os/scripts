@@ -30,7 +30,6 @@ usage () {
   echo "    -r <architecture>" 1>&2
   echo "    -t <package type (deb|rpm|appimage|portable|nsis|dmg|zip)>" 1>&2
   echo "    -v <version type (production|prerelease|snapshot)>" 1>&2
-  echo "    -w <temporary directory>" 1>&2
   echo "    -n <npm data directory>" 1>&2
   exit 1
 }
@@ -39,7 +38,6 @@ ARGV_BASE_DIRECTORY=""
 ARGV_ARCHITECTURE=""
 ARGV_PACKAGE_TYPE=""
 ARGV_VERSION_TYPE=""
-ARGV_TEMPORARY_DIRECTORY=""
 ARGV_NPM_DATA_DIRECTORY=""
 
 while getopts ":b:r:t:v:w:n:" option; do
@@ -48,7 +46,6 @@ while getopts ":b:r:t:v:w:n:" option; do
     r) ARGV_ARCHITECTURE=$OPTARG ;;
     t) ARGV_PACKAGE_TYPE=$OPTARG ;;
     v) ARGV_VERSION_TYPE=$OPTARG ;;
-    w) ARGV_TEMPORARY_DIRECTORY=$OPTARG ;;
     n) ARGV_NPM_DATA_DIRECTORY=$OPTARG ;;
     *) usage ;;
   esac
@@ -58,7 +55,6 @@ if [ -z "$ARGV_BASE_DIRECTORY" ] \
   || [ -z "$ARGV_ARCHITECTURE" ] \
   || [ -z "$ARGV_PACKAGE_TYPE" ] \
   || [ -z "$ARGV_VERSION_TYPE" ] \
-  || [ -z "$ARGV_TEMPORARY_DIRECTORY" ] \
   || [ -z "$ARGV_NPM_DATA_DIRECTORY" ]; then
   usage
 fi
