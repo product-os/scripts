@@ -9,4 +9,4 @@ action="$(yq r .git/.version 'action')"
 type="$(yq r .git/.version 'type')"
 
 set -o pipefail
-[[ "${action}" != "merged" ]] && [[ "${type}" != "VersionEvent"]]
+[[ "${action}" != "merged" ]] && [[ "${type}" != "VersionEvent" ]]
