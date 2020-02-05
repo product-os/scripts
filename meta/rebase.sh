@@ -6,14 +6,17 @@ set -u
 
 pushd $ARGV_DIRECTORY
 
-if [[ -z "$GITHUB_TOKEN" ]]; then
-	echo "Set the GITHUB_TOKEN env variable."
-	env
-	exit 1
-fi
-
 baseRepo=$(jq -r '.base_repo' .git/.version)
 baseOrg=$(jq -r '.base_org' .git/.version)
+
+if [ -f repo.yml ]; then
+	should_rebase=$(yq read repo.yml 'autoRebase')
+
+	if [ "$should_rebase" == "false" ]; then
+		echo "Opting out of auto rebase"
+		exit 0
+	fi
+fi
 
 COMMITTER_NAME="Balena CI"
 # Find PR to rebase
