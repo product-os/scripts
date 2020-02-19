@@ -6,6 +6,16 @@ set -u
 
 [[ "${DEBUG}" == "false" ]] || set -x
 
+emitPrivateArgs(){
+  local args=""
+  if test "$privateRepo" == "true"; then
+    args="--private"
+    test -n "$READONLY_TEAM" && args="$args -t $READONLY_TEAM"
+  fi
+
+  echo "$args"
+}
+
 pushd $ARGV_DIRECTORY
 
 headBranch=$(jq -r '.head_branch' .git/.version)
@@ -33,8 +43,9 @@ fi
 
 sha=$(git rev-parse HEAD)
 
-resinci-deploy store npm . \
-  $([[ "$privateRepo" == "true" ]] && echo "--private") \
-  -s ${sha} \
-  -b ${headBranch} \
+privateArgs=$(emitPrivateArgs)
+resinci-deploy store npm .  \
+  $privateArgs              \
+  -s ${sha}                 \
+  -b ${headBranch}          \
   -v ${version}
