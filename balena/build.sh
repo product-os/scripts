@@ -16,10 +16,18 @@ get_device_type_from_project() {
     echo "$(grep ^deviceType ${SRC_PATH}/repo.yml | awk '{print $2}')"
 }
 
+is_device_type_supported() {
+    balena devices supported | grep -q "^${device_type}\ \+"
+}
+
+
 app_name=$(get_project_name_from_source)
 device_type=$(get_device_type_from_project)
 
-test -z "$device_type" && echo "ERROR: Missing device type" && exit 1
+if ! is_device_type_supported "$device_type"; then
+    echo "ERROR: Invalid device type '$device_type'"
+    exit 1
+fi
 
 balena login -t $API_KEY
 if ! balena_app_exists "$app_name"; then
