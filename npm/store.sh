@@ -24,7 +24,7 @@ repo=$(jq -r '.base_repo' .git/.version)
 version=$(jq -r '.componentVersion' .git/.version)
 
 privateRepo=false
-if curl https://github.com/$org/$repo -I | grep 'Status: 404'; then
+if curl https://github.com/$org/$repo -I | grep -i 'status: 404'; then
   privateRepo=true
 fi
 
