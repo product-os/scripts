@@ -1,10 +1,11 @@
-#!/bin/bash -e
+#!/usr/bin/env bash
 
 echo "TASKINFO: Build the application in BalenaCloud"
+set -e
+SRC_PATH="$1"
+set -u
 
 test "${DEBUG}" == "false" || set -x
-
-SRC_PATH="$1"
 
 balena_app_exists() {
   return $(balena apps | grep -q "$1")
