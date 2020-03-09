@@ -24,4 +24,4 @@ if [ "${sut}" == "" ]; then
   sut="sut"
 fi
 
-docker-compose -f docker-compose.test.yml up --exit-code-from "${sut}" --build --force-recreate
+docker-compose -f docker-compose.yml -f docker-compose.test.yml up --exit-code-from "${sut}" --build
