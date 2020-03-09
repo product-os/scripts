@@ -5,6 +5,9 @@ set -e
 SRC_PATH="$1"
 set -u
 
+# Login before setting -x to avoid printing the TOKEN
+balena login -t $API_KEY
+echo "Logged in as $(balena whoami | grep USERNAME | cut -d ' ' -f2)"
 test "${DEBUG}" == "false" || set -x
 
 balena_app_exists() {
@@ -41,7 +44,6 @@ create_balena_app() {
 
 app_name=$(get_project_name_from_source)
 
-balena login -t $API_KEY
 if ! balena_app_exists "$app_name"; then
     create_balena_app "$app_name"
 fi
