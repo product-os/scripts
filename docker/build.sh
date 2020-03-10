@@ -14,13 +14,17 @@ set -u
 [[ "${DEBUG}" == "false" ]] || set -x
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-
+CONCOURSE_WORKDIR=$(pwd)
 pushd $ARGV_DIRECTORY
 
 sha=$(git rev-parse HEAD)
 branch=$(cat .git/.version | jq -r '.head_branch')
 branch=${branch//[^a-zA-Z0-9_-]/-}
 
+export_image() {
+  local image_name="$1"
+  docker save $image_name > "$CONCOURSE_WORKDIR/image-cache/${image_name}"
+}
 
 function build() {
   path=$1; shift
@@ -51,13 +55,14 @@ function build() {
     # Tag the freshly built image as latest, so it can be consumed by other
     # images being built in this same repo
     docker tag ${DOCKER_IMAGE}:${sha} ${DOCKER_IMAGE}:latest
-
-
-    [[ "${publish}" == "false" ]] && return
-
-    docker push ${DOCKER_IMAGE}:${sha}
-    docker tag ${DOCKER_IMAGE}:${sha} ${DOCKER_IMAGE}:${branch}
-    docker push ${DOCKER_IMAGE}:${branch}
+    export_image ${DOCKERFILE}
+    #
+    #
+    # [[ "${publish}" == "false" ]] && return
+    #
+    # docker push ${DOCKER_IMAGE}:${sha}
+    # docker tag ${DOCKER_IMAGE}:${sha} ${DOCKER_IMAGE}:${branch}
+    # docker push ${DOCKER_IMAGE}:${branch}
   )
 }
 
