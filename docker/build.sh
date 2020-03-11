@@ -21,9 +21,14 @@ sha=$(git rev-parse HEAD)
 branch=$(cat .git/.version | jq -r '.head_branch')
 branch=${branch//[^a-zA-Z0-9_-]/-}
 
+sanitise_image_name() {
+  echo ${1//[^a-zA-Z0-9_-]/-}
+}
+
 export_image() {
   local image_name="$1"
-  docker save $image_name > "$CONCOURSE_WORKDIR/image-cache/${image_name}"
+  local sanitised_image_name=$(sanitise_image_name "${image_name}")
+  docker save $image_name > "$CONCOURSE_WORKDIR/image-cache/${sanitised_image_name}"
 }
 
 function build() {
@@ -50,19 +55,11 @@ function build() {
       ${args} \
       --build-arg RESINCI_REPO_COMMIT=${sha} \
       --build-arg CI=true \
-      -t ${DOCKER_IMAGE}:${sha} \
+      -t ${DOCKER_IMAGE} \
       -f ${DOCKERFILE} .
-    # Tag the freshly built image as latest, so it can be consumed by other
-    # images being built in this same repo
-    docker tag ${DOCKER_IMAGE}:${sha} ${DOCKER_IMAGE}:latest
-    export_image ${DOCKERFILE}
-    #
-    #
-    # [[ "${publish}" == "false" ]] && return
-    #
-    # docker push ${DOCKER_IMAGE}:${sha}
-    # docker tag ${DOCKER_IMAGE}:${sha} ${DOCKER_IMAGE}:${branch}
-    # docker push ${DOCKER_IMAGE}:${branch}
+
+    docker tag ${DOCKER_IMAGE} ${DOCKER_IMAGE}:latest
+    export_image ${DOCKER_IMAGE}
   )
 }
 
