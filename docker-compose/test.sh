@@ -56,4 +56,4 @@ if [ "${sut}" == "null" ]; then
   sut="sut"
 fi
 
-docker-compose -f docker-compose.yml -f docker-compose.test.yml up --exit-code-from "${sut}"
+COMPOSE_DOCKER_CLI_BUILD=1 docker-compose -f docker-compose.yml -f docker-compose.test.yml up --exit-code-from "${sut}"
