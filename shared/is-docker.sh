@@ -23,6 +23,9 @@ if [[ -f "repo.yml" ]]; then
   # If project type is build-in-container it will still have a Dockerfile
   # but we want to treat it differently
   [[ "$project_type" == "build-in-container" ]] && exit 1
+  # If project type is balena-engine it will still have a Dockerfile
+  # but we want to treat it differently
+  [[ "$project_type" == "balena-engine" ]] && exit 1
 fi
 
 [[ -f Dockerfile ]] && exit 0
