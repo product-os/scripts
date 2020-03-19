@@ -41,4 +41,7 @@ mkdir -p "/go/src/${ARGV_GO_PKG}"
 cp -Lr "${ARGV_BASE_DIRECTORY}/." "/go/src/${ARGV_GO_PKG}/"
 pushd "/go/src/${ARGV_GO_PKG}" >/dev/null
 
+export DOCKER_BUILDTAGS='no_cri no_btrfs no_devmapper exclude_graphdriver_btrfs exclude_graphdriver_devicemapper'
+
 hack/dind hack/test/unit
+hack/dind hack/make.sh dynbinary-balena test-integration
