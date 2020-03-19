@@ -15,7 +15,8 @@ set -u
 
 store_image() {
   local image="$1"
-  docker tag ${image}:${sha} ${image}:${base_branch}
+  docker tag ${image}:latest ${image}:${sha}
+  docker tag ${image}:latest ${image}:${base_branch}
 
   docker push ${image}:${sha}
   docker push ${image}:${base_branch}
