@@ -8,16 +8,6 @@ echo ${DOCKER_PASSWORD} | docker login -u ${DOCKER_USERNAME} --password-stdin
 unset DOCKER_USERNAME
 unset DOCKER_PASSWORD
 
-sanitise_image_name() {
-  echo ${1//[^a-zA-Z0-9_-]/-}
-}
-
-import_image() {
-  local image_name="$1"
-  local sanitised_image_name=$(sanitise_image_name "${image_name}")
-  docker load < "$CONCOURSE_WORKDIR/image-cache/${sanitised_image_name}"
-}
-
 set -e
 ARGV_DIRECTORY="$1"
 set -u
@@ -26,10 +16,9 @@ set -u
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CONCOURSE_WORKDIR=$(pwd)
+DOCKER_IMAGE_CACHE="${CONCOURSE_WORKDIR}/image-cache"
 
 pushd $ARGV_DIRECTORY
-
-[[ -f docker-compose.test.yml ]] || exit 0
 
 base_org=$(cat .git/.version | jq -r '.base_org')
 base_repo=$(cat .git/.version | jq -r '.base_repo')
@@ -44,10 +33,10 @@ if [ -n "$builds" ]; then
   for build in ${builds}; do
     repo=$((echo ${build} | jq -r '.docker_repo') || \
       (echo "${base_org}/${base_repo}"))
-    import_image "$repo"
+    import_image "${repo}" "${DOCKER_IMAGE_CACHE}"
   done
 else
-  import_image "${base_org}/${base_repo}"
+  import_image "${base_org}/${base_repo}" "${DOCKER_IMAGE_CACHE}"
 fi
 
 sut=$(yq read repo.yml 'sut')

@@ -14,22 +14,15 @@ set -u
 [[ "${DEBUG}" == "false" ]] || set -x
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${HERE}/image-cache.sh"
+
 CONCOURSE_WORKDIR=$(pwd)
+DOCKER_IMAGE_CACHE="${CONCOURSE_WORKDIR}/image-cache"
 pushd $ARGV_DIRECTORY
 
 sha=$(git rev-parse HEAD)
 branch=$(cat .git/.version | jq -r '.head_branch')
 branch=${branch//[^a-zA-Z0-9_-]/-}
-
-sanitise_image_name() {
-  echo ${1//[^a-zA-Z0-9_-]/-}
-}
-
-export_image() {
-  local image_name="$1"
-  local sanitised_image_name=$(sanitise_image_name "${image_name}")
-  docker save $image_name > "$CONCOURSE_WORKDIR/image-cache/${sanitised_image_name}"
-}
 
 function build() {
   path=$1; shift
@@ -59,7 +52,7 @@ function build() {
       -f ${DOCKERFILE} .
 
     docker tag ${DOCKER_IMAGE} ${DOCKER_IMAGE}:latest
-    export_image ${DOCKER_IMAGE}
+    export_image "${DOCKER_IMAGE}" "${DOCKER_IMAGE_CACHE}"
   )
 }
 
