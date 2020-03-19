@@ -14,13 +14,15 @@ set -u
 [[ "${DEBUG}" == "false" ]] || set -x
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${HERE}/image-cache.sh"
 
+CONCOURSE_WORKDIR=$(pwd)
+DOCKER_IMAGE_CACHE="${CONCOURSE_WORKDIR}/image-cache"
 pushd $ARGV_DIRECTORY
 
 sha=$(git rev-parse HEAD)
 branch=$(cat .git/.version | jq -r '.head_branch')
 branch=${branch//[^a-zA-Z0-9_-]/-}
-
 
 function build() {
   path=$1; shift
@@ -46,18 +48,11 @@ function build() {
       ${args} \
       --build-arg RESINCI_REPO_COMMIT=${sha} \
       --build-arg CI=true \
-      -t ${DOCKER_IMAGE}:${sha} \
+      -t ${DOCKER_IMAGE} \
       -f ${DOCKERFILE} .
-    # Tag the freshly built image as latest, so it can be consumed by other
-    # images being built in this same repo
-    docker tag ${DOCKER_IMAGE}:${sha} ${DOCKER_IMAGE}:latest
 
-
-    [[ "${publish}" == "false" ]] && return
-
-    docker push ${DOCKER_IMAGE}:${sha}
-    docker tag ${DOCKER_IMAGE}:${sha} ${DOCKER_IMAGE}:${branch}
-    docker push ${DOCKER_IMAGE}:${branch}
+    docker tag ${DOCKER_IMAGE} ${DOCKER_IMAGE}:latest
+    export_image "${DOCKER_IMAGE}" "${DOCKER_IMAGE_CACHE}"
   )
 }
 
