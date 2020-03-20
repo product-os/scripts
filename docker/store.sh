@@ -51,8 +51,10 @@ if [ -n "$builds" ]; then
     publish=$((echo ${build} | jq -r '.publish') || echo true)
     args=$((echo ${build} | jq -r '.args // [] | map("--build-arg " + .) | join(" ")') || echo "")
 
-    import_image "$repo" "${DOCKER_IMAGE_CACHE}"
-    store_image "$repo"
+    if [ "$publish" == "true" ]; then
+      import_image "$repo" "${DOCKER_IMAGE_CACHE}"
+      store_image "$repo"
+    fi
   done
 
 else
@@ -62,7 +64,9 @@ else
     publish=true
   fi
 
-  import_image "${base_org}/${base_repo}" "${DOCKER_IMAGE_CACHE}"
-  store_image "${base_org}/${base_repo}"
+  if [ "$publish" == "true" ]; then
+    import_image "${base_org}/${base_repo}" "${DOCKER_IMAGE_CACHE}"
+    store_image "${base_org}/${base_repo}"
+  fi
 
 fi
