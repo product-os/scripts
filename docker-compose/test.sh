@@ -15,6 +15,7 @@ set -u
 [[ "${DEBUG}" == "false" ]] || set -x
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${HERE}/../docker/image-cache.sh"
 CONCOURSE_WORKDIR=$(pwd)
 DOCKER_IMAGE_CACHE="${CONCOURSE_WORKDIR}/image-cache"
 
