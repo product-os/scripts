@@ -66,13 +66,13 @@ if [ -n "$builds" ]; then
   build_pids=()
   for build in ${builds}; do
     echo ${build}
-    repo=$((echo ${build} | jq -r '.docker_repo') || echo "")
+    repo=$(echo ${build} | jq -r '.docker_repo')
     dockerfile=$((echo ${build} | jq -r '.dockerfile') || echo Dockerfile)
     path=$((echo ${build} | jq -r '.path') || echo .)
     publish=$((echo ${build} | jq -r '.publish') || echo true)
     args=$((echo ${build} | jq -r '.args // [] | map("--build-arg " + .) | join(" ")') || echo "")
 
-    if [ "$repo" == "" ]; then
+    if [ "$repo" == "null" ]; then
       echo "docker_repo must be set for every image. The value should be unique across the images in builds"
       exit 1
     fi
