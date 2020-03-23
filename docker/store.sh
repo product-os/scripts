@@ -44,14 +44,18 @@ builds=$(${HERE}/../shared/resinci-read.sh \
 if [ -n "$builds" ]; then
   for build in ${builds}; do
     echo ${build}
-    repo=$((echo ${build} | jq -r '.docker_repo') || \
-      (echo "${base_org}/${base_repo}"))
     dockerfile=$((echo ${build} | jq -r '.dockerfile') || echo Dockerfile)
     path=$((echo ${build} | jq -r '.path') || echo .)
     publish=$((echo ${build} | jq -r '.publish') || echo true)
     args=$((echo ${build} | jq -r '.args // [] | map("--build-arg " + .) | join(" ")') || echo "")
 
-    if [ "$publish" == "true" ]; then
+    repo=$(echo ${build} | jq -r '.docker_repo')
+    if [ "$repo" == "null" ]; then
+        repo=$(echo "${base_org}/${base_repo}")
+        echo "WARNING!!! .docker repo not set. Using '$repo' as repo"
+    fi
+
+    if [ "$publish" != "false" ]; then
       import_image "$repo" "${DOCKER_IMAGE_CACHE}"
       store_image "$repo"
     fi
@@ -64,7 +68,7 @@ else
     publish=true
   fi
 
-  if [ "$publish" == "true" ]; then
+  if [ "$publish" != "false" ]; then
     import_image "${base_org}/${base_repo}" "${DOCKER_IMAGE_CACHE}"
     store_image "${base_org}/${base_repo}"
   fi
