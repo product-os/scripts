@@ -48,6 +48,7 @@ function build() {
       ${args} \
       --build-arg RESINCI_REPO_COMMIT=${sha} \
       --build-arg CI=true \
+      --build-arg NPM_TOKEN=${NPM_TOKEN} \
       -t ${DOCKER_IMAGE} \
       -f ${DOCKERFILE} .
 
