@@ -13,4 +13,4 @@ popd
 
 pushd $ARGV_DIRECTORY
 
-rfq generate . -m 3dhubs -p cnc -o ../outputs
+rfq generate . -o ../outputs
