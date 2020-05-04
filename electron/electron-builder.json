@@ -79,8 +79,7 @@
   },
   "rpm": {
     "depends": [
-      "lsb",
-      "libXScrnSaver"
+      "util-linux"
     ]
   }
 }
