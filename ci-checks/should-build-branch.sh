@@ -17,12 +17,12 @@ number=$(jq -r '.number' .git/.version)
 # If the PR is targeting master then we exit with success
 [[ "${base}" == "master" ]] && exit 0
 
-# Otherwise we check if a Backport footer exists, and fail if not
+# Check if the branch is or is being declared as ESR
+esr="$(yq r repo.yml 'esr.version')"
+[[ "${esr}" != "null" ]] && exit 0
+
+# Otherwise we check if a meta footer exists, and fail if not
 COMMITS=$(find-commits parsed -r ${baseRepo} -o ${baseOrg} -n ${number})
-
-IS_BACKPORT_COMMIT=$(echo ${COMMITS} | jq -c '[.[].footers] | add' | jq 'map(select(. | startswith("Backport-to:"))) | length > 0')
-
-[[ ${IS_BACKPORT_COMMIT} == "true" ]] && exit 0
 
 IS_META_COMMIT=$(echo ${COMMITS} | jq -c '[.[].footers] | add' | jq 'map(select(. | startswith("Change-type:"))) | length > 0 and all(contains("none"))')
 
