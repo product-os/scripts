@@ -37,7 +37,7 @@ popd
 
 pushd $ARGV_DIRECTORY
 
-if /usr/bin/egrep '(preversion|postversion|prepare|prepack|postpack|publish)' package.json; then
+if egrep '(preversion|postversion|prepare|prepack|postpack|publish)' package.json; then
   npm install
 fi
 

@@ -10,7 +10,7 @@ set -u
 apk add --no-cache grep
 
 author=$(cd ${ARGV_DIRECTORY} && git show -s --format=%aN)
-if echo "$author" | /usr/bin/egrep -zoi 'resin-io(-\w+)?-versionbot'; then
+if echo "$author" | egrep -zoi 'resin-io(-\w+)?-versionbot'; then
   echo "User is a versionbot; skipping validation"
   exit 0
 fi

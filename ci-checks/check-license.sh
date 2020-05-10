@@ -21,6 +21,6 @@ if ls license*; then
   apk add --no-cache grep > /dev/null
   echo "Running regex test" 1>&2
   # Only fail if license is present but not one of the specified ones
-  /usr/bin/egrep -zoi '(apache.*2.0|affero general public license)' license*
+  egrep -zoi '(apache.*2.0|affero general public license)' license*
   exit
 fi
