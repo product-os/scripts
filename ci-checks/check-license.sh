@@ -10,7 +10,7 @@ set -u
 pushd source
 
 uri=$(jq -r '.uri' .git/.version)
-isFork=$(scrutinizer remote ${uri} | jq -r '.fork')
+isFork=$(scrutinizer remote ${uri} github-metadata | jq -r '.fork')
 
 # If repo is a fork it might have a different license we can't change
 [[ $isFork == "true" ]] && exit 0
