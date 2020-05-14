@@ -53,7 +53,7 @@ if [ "$ARGV_TARGET_OPERATING_SYSTEM" = "linux" ]; then
   # to perform their job.
   # That won't run in a headless GNU/Linux worker unless we
   # run the command with `xvfb-run`.
-  xvfb-run --server-args="-extension GLX" env ELECTRON_NO_ATTACH_CONSOLE=true "$HERE/../shared/npm-execute-script.sh" \
+  xvfb-run --server-args="-extension GLX -screen 0 1024x768x24" env ELECTRON_NO_ATTACH_CONSOLE=true "$HERE/../shared/npm-execute-script.sh" \
     -b "$ARGV_BASE_DIRECTORY" \
     -s concourse-test-electron
 else
