@@ -20,9 +20,11 @@ CONCOURSE_WORKDIR=$(pwd)
 DOCKER_IMAGE_CACHE="${CONCOURSE_WORKDIR}/image-cache"
 pushd $ARGV_DIRECTORY
 
-sha=$(git rev-parse HEAD)
+sha=$(cat .git/.version | jq -r '.sha')
 branch=$(cat .git/.version | jq -r '.head_branch')
 branch=${branch//[^a-zA-Z0-9_-]/-}
+
+echo "commit SHA: $sha"
 
 function build() {
   path=$1; shift
@@ -97,6 +99,26 @@ else
 
   build . Dockerfile $(cat .git/.version | jq -r '.base_org + "/" + .base_repo') $publish ""
 fi
+
+echo "========== Build finished =========="
+
+docker images
+
+if [ -f docker-compose.test.yml ]; then
+  sut=$(yq read repo.yml 'sut')
+
+  if [ "${sut}" == "null" ]; then
+    sut="sut"
+  fi
+
+  COMPOSE_DOCKER_CLI_BUILD=1 docker-compose -f docker-compose.yml -f docker-compose.test.yml up --exit-code-from "${sut}"
+fi
+
+echo "========== Tests finished =========="
+
+${HERE}/store.sh
+
+echo "========== Store finished =========="
 
 # Ensure we explicitly exit so we catch the signal and shut down
 # the daemon. Otherwise this container will hang until it's
