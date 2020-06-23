@@ -35,6 +35,10 @@ emit_rebase_event() {
   echo "RebaseEvent"
 }
 
+emit_republish_event() {
+  echo "RepublishEvent"
+}
+
 if [ "$type" == "PullRequestEvent" ]; then
   if [ "${action}" == "merged" ]; then
     emit_merge_event
@@ -47,6 +51,8 @@ elif [ "$type" == "IssueCommentEvent" ]; then
     emit_build_event
   elif [ "$action" == "rebase" ]; then
     emit_rebase_event
+  elif [ "$action" == "republish" ]; then
+    emit_republish_event
   fi
 
 elif [ "$type" == "PushEvent" ]; then
