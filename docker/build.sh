@@ -23,6 +23,14 @@ pushd $ARGV_DIRECTORY
 sha=$(cat .git/.version | jq -r '.sha')
 branch=$(cat .git/.version | jq -r '.head_branch')
 branch=${branch//[^a-zA-Z0-9_-]/-}
+owner=$(cat .git/.version | jq -r '.base_org')
+repo=$(cat .git/.version | jq -r '.base_repo')
+
+chamber export --format dotenv "test-runtime-secrets/repos/${owner}/${repo}" -o runtime-secrets
+export $(cat runtime-secrets | xargs)
+
+unset AWS_ACCESS_KEY_ID
+unset AWS_SECRET_ACCESS_KEY
 
 function build() {
   path=$1; shift
