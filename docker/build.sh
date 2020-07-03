@@ -27,7 +27,9 @@ owner=$(cat .git/.version | jq -r '.base_org')
 repo=$(cat .git/.version | jq -r '.base_repo')
 
 chamber export --format dotenv "test-runtime-secrets/repos/${owner}/${repo}" -o runtime-secrets
-export $(cat runtime-secrets | xargs)
+if [ -s runtime-secrets ]; then
+  export $(cat runtime-secrets | xargs)
+fi
 
 unset AWS_ACCESS_KEY_ID
 unset AWS_SECRET_ACCESS_KEY
