@@ -33,6 +33,7 @@ fi
 
 unset AWS_ACCESS_KEY_ID
 unset AWS_SECRET_ACCESS_KEY
+rm -rf runtime-secrets
 
 function build() {
   path=$1; shift
