@@ -28,7 +28,10 @@ repo=$(cat .git/.version | jq -r '.base_repo')
 
 chamber export --format dotenv "concourse/test-runtime-secrets/repos/${owner}/${repo}" -o runtime-secrets
 if [ -s runtime-secrets ]; then
-  export $(cat runtime-secrets | xargs)
+  while IFS= read -r -d $'\n'
+  do
+    export "$REPLY"
+  done < runtime-secrets
 fi
 
 unset AWS_ACCESS_KEY_ID
