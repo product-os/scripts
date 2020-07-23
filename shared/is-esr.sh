@@ -10,5 +10,5 @@ action="$(jq -r '.action' .git/.version)"
 [ -f repo.yml ] || exit 1
 
 esr="$(yq r repo.yml 'esr.version')"
-[[ "${action}" == "merged" ]] || exit 1
+[[ "${action}" == "merged" ]] || [[ "${action}" == "republish" ]] || exit 1
 [[ "${esr}" != "null" ]] || exit 1
