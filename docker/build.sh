@@ -27,6 +27,10 @@ owner=$(cat .git/.version | jq -r '.base_org')
 repo=$(cat .git/.version | jq -r '.base_repo')
 
 chamber export --format dotenv "concourse/test-runtime-secrets/repos/${owner}/${repo}" -o runtime-secrets
+
+unset AWS_ACCESS_KEY_ID
+unset AWS_SECRET_ACCESS_KEY
+
 if [ -s runtime-secrets ]; then
   while IFS= read -r -d $'\n'
   do
@@ -34,8 +38,6 @@ if [ -s runtime-secrets ]; then
   done < runtime-secrets
 fi
 
-unset AWS_ACCESS_KEY_ID
-unset AWS_SECRET_ACCESS_KEY
 rm -rf runtime-secrets
 
 function build() {
