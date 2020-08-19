@@ -27,11 +27,12 @@ create_balena_app() {
   set +e
 
   local app_name="$1"
+  local device_type="$2"
   local rtn=0
 
   # If we want to get both the output and return value of a command in a subshell, we cannot use 'local'
   # since $? will get its return value which always is... 0
-  output=$(balena app create "$app_name" -t $DEVICE_TYPE)
+  output=$(balena app create "$app_name" -t $device_type)
   rtn=$?
 
   if test $rtn  == 1 && concurrent_app_creation_happened "$output"; then
@@ -43,9 +44,15 @@ create_balena_app() {
 }
 
 app_name=$(get_project_name_from_source)
+IFS=', ' read -a device_types <<< $DEVICE_TYPE
+for device_type in "${device_types[@]}"
+do
+    echo building for "$device_type"
+    full_app_name=$app_name"-"$device_type
 
-if ! balena_app_exists "$app_name"; then
-    create_balena_app "$app_name"
-fi
+    if ! balena_app_exists "$full_app_name"; then
+        create_balena_app "$full_app_name" "$device_type"
+    fi
 
-balena push $app_name -s $SRC_PATH
+    balena push $full_app_name -s $SRC_PATH
+done
