@@ -19,14 +19,13 @@ should_run="$(${HERE}/scripts/shared/resinci-read.sh \
 
 if [[ -f "repo.yml" ]]; then
   project_type="$(yq read repo.yml 'type')"
+  # All of these types will still have a Dockerfile, but
+  # should not trigger this check
   [[ "$project_type" == "generic" ]] && exit 1
   [[ "$project_type" == "docker-compose" ]] && exit 1
-  # If project type is build-in-container it will still have a Dockerfile
-  # but we want to treat it differently
   [[ "$project_type" == "build-in-container" ]] && exit 1
-  # If project type is balena-engine it will still have a Dockerfile
-  # but we want to treat it differently
   [[ "$project_type" == "balena-engine" ]] && exit 1
+  [[ "$project_type" == "balena" ]] && exit 1
 fi
 
 [[ -f Dockerfile ]] && exit 0
