@@ -38,6 +38,9 @@ popd
 pushd $ARGV_DIRECTORY
 
 if egrep '(preversion|postversion|prepare|prepack|postpack|publish)' package.json; then
+  set +x
+  echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
+  set -x
   npm install
 fi
 
