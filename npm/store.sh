@@ -41,10 +41,12 @@ if egrep '(preversion|postversion|prepare|prepack|postpack|publish)' package.jso
   set +x
   echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
   set -x
-  npm install
+  npm install --unsafe-perm
 fi
 
 sha=$(git rev-parse HEAD)
+
+npm config set unsafe-perm
 
 privateArgs=$(emitPrivateArgs)
 resinci-deploy store npm .  \
