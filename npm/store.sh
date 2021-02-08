@@ -23,9 +23,9 @@ org=$(jq -r '.base_org' .git/.version)
 repo=$(jq -r '.base_repo' .git/.version)
 version=$(jq -r '.componentVersion' .git/.version)
 
-privateRepo=false
-if curl https://github.com/$org/$repo -I | grep -i 'status: 404'; then
-  privateRepo=true
+privateRepo=true
+if curl -s -o /dev/null -I -w "%{http_code}" https://github.com/$org/$repo -I | grep '200'; then
+  privateRepo=false
 fi
 
 popd
