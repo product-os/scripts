@@ -55,11 +55,8 @@ if [ "${contract}" == "" ]; then
   exit 1
 fi
 
-targetOwner="balenaci"
-targetRepo="balenaci"
-
 resinci-deploy pr contract ${contract} \
   --source_repo=${baseRepo} \
   --source_version=${version} \
-  --target_owner=${targetOwner} \
-  --target_repo=${targetRepo}
+  --target_owner=${baseOwner} \
+  --target_repo=${baseOwner}
