@@ -47,3 +47,19 @@ resinci-deploy store github ${files} \
   --head_owner=${headOwner} \
   --head_repo=${headRepo} \
   --head_branch=${headBranch}
+
+# PR the contract file to the platform repo
+contract=$(find . -type f \( -iname balena.yml -o -iname balena.cue \) -exec basename {} \;)
+
+if [ "${contract}" == "" ]; then
+  exit 1
+fi
+
+targetOwner="balenaci"
+targetRepo="balenaci"
+
+resinci-deploy pr contract ${contract} \
+  --source_repo=${baseRepo} \
+  --source_version=${version} \
+  --target_owner=${targetOwner} \
+  --target_repo=${targetRepo}
