@@ -104,6 +104,8 @@ fi
 ELECTRON_BUILDER_ARCHITECTURE="$("$HERE/../shared/architecture-convert.sh" -r "$ARGV_ARCHITECTURE" -t electron-builder)"
 if [ $ELECTRON_BUILDER_OS = "win" ]; then
   ARCHITECTURE_FLAGS="--ia32 --x64"
+elif [ $ELECTRON_BUILDER_OS = "mac" ]; then
+  ARCHITECTURE_FLAGS="--universal"
 else
   ARCHITECTURE_FLAGS="--$ELECTRON_BUILDER_ARCHITECTURE"
 fi
