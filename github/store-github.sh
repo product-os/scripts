@@ -53,7 +53,7 @@ resinci-deploy store github ${files} \
 contract=$(find . -type f \( -iname balena.yml -o -iname balena.cue \) -exec basename {} \;)
 
 if [ "${contract}" == "" ]; then
-  exit 1
+  exit 0
 fi
 
 resinci-deploy pr contract ${contract} \
