@@ -16,6 +16,7 @@ headOwner=$(jq -r '.head_org' .git/.version)
 headRepo=$(jq -r '.head_repo' .git/.version)
 
 version=$(jq -r '.componentVersion' .git/.version)
+prNumber=$(jq -r '.number' .git/.version)
 
 if [ "${version}" == "null" ]; then
   echo "No .componentVersion found in .git/.version; not versioning"
@@ -57,6 +58,6 @@ fi
 
 resinci-deploy pr contract ${contract} \
   --source_repo=${baseRepo} \
-  --source_version=${version} \
+  --source_pr_number=${prNumber} \
   --target_owner=${baseOwner} \
   --target_repo=${baseOwner}
