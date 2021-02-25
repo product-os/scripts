@@ -32,9 +32,6 @@ npm link > /dev/null 2>&1
 popd > /dev/null
 pushd $ARGV_DIRECTORY
 
-resinci-deploy generate contracts .versionbot/contracts \
-  -v ${version}
-
 files=$(git ls-files -mo --exclude-standard | tr '\n' ' ')
 
 if [ "${files}" == "" ]; then
