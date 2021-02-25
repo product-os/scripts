@@ -40,6 +40,11 @@ fi
 
 rm -rf runtime-secrets
 
+# register qemu binfmt for automatic emulated arm builds
+# The `--reset` flag is intentionally not used, to avoid a race condition with
+# any ongoing builds on the VM (that could result in `exec format error`).
+docker run --rm --privileged multiarch/qemu-user-static:5.2.0-2 -p yes
+
 function build() {
   path=$1; shift
   DOCKERFILE=$1; shift
