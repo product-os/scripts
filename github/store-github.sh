@@ -47,7 +47,7 @@ resinci-deploy store github ${files} \
   --head_branch=${headBranch}
 
 # PR the contract file to the platform repo
-contract=$(find . -type f \( -iname balena.yml -o -iname balena.cue \) -exec basename {} \;)
+contract=$(find . -maxdepth 1 -type f -iname balena.yml -exec basename {} \;)
 
 if [ "${contract}" == "" ]; then
   exit 0
