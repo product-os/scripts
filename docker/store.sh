@@ -13,13 +13,33 @@ set -u
 
 [[ "${DEBUG}" == "false" ]] || set -x
 
+function image_variant() {
+  local docker_image=$1
+  local docker_tag=${2:-default}
+
+  if [[ "${docker_tag}" == 'default' ]]; then
+    echo "${docker_image}"
+    return
+  fi
+
+  local image_variant="$(echo "${docker_image}" | awk -F':' '{print $2}')"
+  local docker_image="$(echo "${docker_image}" | awk -F':' '{print $1}')"
+
+  if [[ "${image_variant}" == '' ]]; then
+    echo "${docker_image}:${docker_tag}"
+  else
+    echo "${docker_image}:${image_variant}-${docker_tag}"
+  fi
+}
+
 store_image() {
   local image="$1"
-  docker tag ${image}:latest ${image}:${sha}
-  docker tag ${image}:latest ${image}:${base_branch}
+  docker tag $(image_variant ${image}) $(image_variant ${image} latest) || true
+  docker tag $(image_variant ${image} latest) $(image_variant ${image} ${sha})
+  docker tag $(image_variant ${image} latest) $(image_variant ${image} ${base_branch})
 
-  docker push ${image}:${sha}
-  docker push ${image}:${base_branch}
+  docker push $(image_variant ${image} ${sha})
+  docker push $(image_variant ${image} ${base_branch})
 }
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
