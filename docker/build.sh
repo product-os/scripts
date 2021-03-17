@@ -45,6 +45,25 @@ rm -rf runtime-secrets
 # any ongoing builds on the VM (that could result in `exec format error`).
 docker run --rm --privileged multiarch/qemu-user-static:5.2.0-2 -p yes
 
+function image_variant() {
+  local docker_image=$1
+  local docker_tag=${2:-default}
+
+  if [[ "${docker_tag}" == 'default' ]]; then
+    echo "${docker_image}"
+    return
+  fi
+
+  local image_variant="$(echo "${docker_image}" | awk -F':' '{print $2}')"
+  local docker_image="$(echo "${docker_image}" | awk -F':' '{print $1}')"
+
+  if [[ "${image_variant}" == '' ]]; then
+    echo "${docker_image}:${docker_tag}"
+  else
+    echo "${docker_image}:${image_variant}-${docker_tag}"
+  fi
+}
+
 function build() {
   path=$1; shift
   DOCKERFILE=$1; shift
@@ -56,16 +75,16 @@ function build() {
     cd $path
 
     if [ "${publish}" != "false" ]; then
-      docker pull ${DOCKER_IMAGE}:${sha} \
-        || docker pull ${DOCKER_IMAGE}:${branch} \
-        || docker pull ${DOCKER_IMAGE}:master \
+      docker pull $(image_variant ${DOCKER_IMAGE} ${sha}) \
+        || docker pull $(image_variant ${DOCKER_IMAGE} ${branch}) \
+        || docker pull $(image_variant ${DOCKER_IMAGE} master) \
         || true
     fi
 
     docker build \
-      --cache-from ${DOCKER_IMAGE}:${sha} \
-      --cache-from ${DOCKER_IMAGE}:${branch} \
-      --cache-from ${DOCKER_IMAGE}:master \
+      --cache-from $(image_variant ${DOCKER_IMAGE} ${sha}) \
+      --cache-from $(image_variant ${DOCKER_IMAGE} ${branch}) \
+      --cache-from $(image_variant ${DOCKER_IMAGE} master) \
       ${args} \
       --build-arg RESINCI_REPO_COMMIT=${sha} \
       --build-arg CI=true \
@@ -73,7 +92,8 @@ function build() {
       -t ${DOCKER_IMAGE} \
       -f ${DOCKERFILE} .
 
-    docker tag ${DOCKER_IMAGE} ${DOCKER_IMAGE}:latest
+    docker tag $(image_variant ${DOCKER_IMAGE}) $(image_variant ${DOCKER_IMAGE} latest) || true
+    docker tag $(image_variant ${DOCKER_IMAGE} latest) $(image_variant ${DOCKER_IMAGE} latest)
     export_image "${DOCKER_IMAGE}" "${DOCKER_IMAGE_CACHE}"
   )
 }
