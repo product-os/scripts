@@ -107,7 +107,7 @@ export npm_config_progress=false
 export npm_config_spin=false
 
 if [ "$ARGV_TARGET_OPERATING_SYSTEM" = "windows" ]; then
-  MSVS_VERSION=2015
+  MSVS_VERSION=2019
   export GYP_MSVS_VERSION="$MSVS_VERSION"
   export npm_config_msvs_version="$MSVS_VERSION"
 fi
