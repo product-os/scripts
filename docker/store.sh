@@ -34,12 +34,11 @@ function image_variant() {
 
 store_image() {
   local image="$1"
-  docker tag $(image_variant ${image}) $(image_variant ${image} latest) || true
-  docker tag $(image_variant ${image} latest) $(image_variant ${image} ${sha})
-  docker tag $(image_variant ${image} latest) $(image_variant ${image} ${base_branch})
+  docker tag $(image_variant ${image}) $(image_variant ${image} ${sha})
+  docker tag $(image_variant ${image}) $(image_variant ${image} ${branch_tag})
 
   docker push $(image_variant ${image} ${sha})
-  docker push $(image_variant ${image} ${base_branch})
+  docker push $(image_variant ${image} ${branch_tag})
 }
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -54,6 +53,7 @@ base_repo=$(cat .git/.version | jq -r '.base_repo')
 base_branch=$(cat .git/.version | jq -r '.head_branch')
 sha=$(git rev-parse HEAD)
 base_branch=${base_branch//[^a-zA-Z0-9_-]/-}
+branch_tag="build-"${base_branch}
 
 # Read the details of what we should build from .resinci.yml
 builds=$(${HERE}/../shared/resinci-read.sh \
