@@ -20,6 +20,11 @@ CONCOURSE_WORKDIR=$(pwd)
 DOCKER_IMAGE_CACHE="${CONCOURSE_WORKDIR}/image-cache"
 pushd $ARGV_DIRECTORY
 
+# Enable buildkit and prepare npmtoken secret file
+export DOCKER_BUILDKIT=1
+echo $NPM_TOKEN > npmtoken
+export NPM_TOKEN_PATH="$(pwd)/npmtoken"
+
 sha=$(cat .git/.version | jq -r '.sha')
 branch=$(cat .git/.version | jq -r '.head_branch')
 branch=${branch//[^a-zA-Z0-9_-]/-}
@@ -88,7 +93,7 @@ function build() {
       ${args} \
       --build-arg RESINCI_REPO_COMMIT=${sha} \
       --build-arg CI=true \
-      --build-arg NPM_TOKEN=${NPM_TOKEN} \
+      --secret id=npmtoken,src=${NPM_TOKEN_PATH} \
       -t ${DOCKER_IMAGE} \
       -f ${DOCKERFILE} .
 
