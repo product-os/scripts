@@ -27,6 +27,10 @@ fi
 git branch -r
 
 buildBranch=$(git branch -r | grep ".*${parentSHA}$" | sed 's/origin\///g')
+if [ "${buildBranch}" == "" ]; then
+  echo "Could not find build branch. Did you merge before the branch was built?"
+  exit 1
+fi
 
 echo '{}' | jq \
   --arg mergeSha "${mergeSHA}"  \
