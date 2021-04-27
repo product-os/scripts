@@ -110,19 +110,21 @@ function build_with_opts() {
     local build_stages
     build_stages="$(grep -Ei '^FROM\s+.*\s+AS\s+.*$' "${dockerfile}" | tr '[:upper:]' '[:lower:]' | awk -F' as ' '{print $2}')"
 
-    if [[ ${build_stages} == '' ]]; then
-        # normal build
-        docker build "$@"
+    # always build cache and ultimate (run) stage even if unlabelled
+    if is_buildx; then
+        docker buildx build "$@"
     else
-        # multistage build handling
-        for stage in ${build_stages}; do
-            if is_buildx; then
-                docker buildx build --target "${stage}" "$@"
-            else
-                docker build --target "${stage}" "$@"
-            fi
-        done
+        docker build "$@"
     fi
+
+    # multistage build handling
+    for stage in ${build_stages}; do
+        if is_buildx; then
+            docker buildx build --target "${stage}" "$@"
+        else
+            docker build --target "${stage}" "$@"
+        fi
+    done
 }
 
 function build() {
