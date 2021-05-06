@@ -3,7 +3,6 @@
 echo "TASKINFO: Build the application in BalenaCloud"
 set -e
 SRC_PATH="$1"
-set -u
 
 # https://git-secret.io/
 if [[ -n ${GPG_PRIVATE_KEY} ]] && [[ -n ${GPG_PASSPHRASE} ]] \
@@ -25,6 +24,9 @@ if [[ -n ${GPG_PRIVATE_KEY} ]] && [[ -n ${GPG_PASSPHRASE} ]] \
       && git secret whoknows \
       && popd
 fi
+
+# bomb on unbound variables from here onwards
+set -u
 
 # Login before setting -x to avoid printing the TOKEN
 balena login -t "${API_KEY}"
