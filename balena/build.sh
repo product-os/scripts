@@ -34,7 +34,7 @@ echo "Logged in as $(balena whoami | grep USERNAME | cut -d ' ' -f2)"
 test "${DEBUG}" == "false" || set -x
 
 balena_app_exists() {
-  balena apps | grep -q "$1"
+  balena apps | grep -qE "\s+$1\s+"
 }
 
 get_project_name_from_source() {
@@ -80,8 +80,8 @@ create_balena_app() {
 app_name="$(get_app_name)"
 org_name="$(get_org_name)"
 
-if ! balena_app_exists "${app_name}"; then
+if ! balena_app_exists "${org_name}/${app_name}"; then
     create_balena_app "${app_name}" "${org_name}"
 fi
 
-balena push "${app_name}" -s "${SRC_PATH}"
+balena push "${org_name}/${app_name}" -s "${SRC_PATH}"
