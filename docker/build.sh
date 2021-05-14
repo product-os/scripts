@@ -134,23 +134,27 @@ function build() {
   publish=$1; shift
   args=$1; shift
   secrets=$1; shift
+  sha_image=$(image_variant "${DOCKER_IMAGE}" "${sha}")
+  branch_image=$(image_variant "${DOCKER_IMAGE}" "build-${branch}")
+  master_image=$(image_variant "${DOCKER_IMAGE}" master)
+  latest_image=$(image_variant "${DOCKER_IMAGE}" latest)
 
   (
     cd "${path}"
 
     if [ "${publish}" != "false" ]; then
-      docker pull "$(image_variant "${DOCKER_IMAGE}" "${sha}")" || true
-      docker pull "$(image_variant "${DOCKER_IMAGE}" "build-${branch}")" || true
-      docker pull "$(image_variant "${DOCKER_IMAGE}" master)" || true
+      docker pull "${sha_image}" || true
+      docker pull "${branch_image}" || true
+      docker pull "${master_image}" || true
     fi
 
     # shellcheck disable=SC2086
     build_with_opts \
       "${DOCKERFILE}" \
       --progress=plain \
-      --cache-from "$(image_variant "${DOCKER_IMAGE}" "${sha}")" \
-      --cache-from "$(image_variant "${DOCKER_IMAGE}" "build-${branch}")" \
-      --cache-from "$(image_variant "${DOCKER_IMAGE}" master)" \
+      --cache-from "${sha_image}" \
+      --cache-from "${branch_image}" \
+      --cache-from "${master_image}" \
       ${args} \
       --build-arg RESINCI_REPO_COMMIT="${sha}" \
       --build-arg CI=true \
@@ -160,8 +164,11 @@ function build() {
       -t "${DOCKER_IMAGE}" \
       -f "${DOCKERFILE}" .
 
-    docker tag "$(image_variant "${DOCKER_IMAGE}")" "$(image_variant "${DOCKER_IMAGE}" latest)" || true
-    docker tag "$(image_variant "${DOCKER_IMAGE}" latest)" "$(image_variant "${DOCKER_IMAGE}" latest)"
+    docker tag $(image_variant ${DOCKER_IMAGE}) ${latest_image} || true
+
+    # Scan the image with trivy and output to stdout
+    trivy --no-progress --exit-code 0 --severity HIGH --ignore-unfixed ${latest_image}
+
     export_image "${DOCKER_IMAGE}" "${DOCKER_IMAGE_CACHE}"
   )
 }
