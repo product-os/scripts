@@ -172,7 +172,7 @@ function build() {
     --header 'auth: '${TRIVY_SCAN_TOKEN} \
     --header 'imagename: '${latest_image} \
     --header 'Content-Type: application/json' \
-    --data @trivy_output.json
+    --data '@'$sha'.json'
     rm $sha'.json'
 
     export_image "${DOCKER_IMAGE}" "${DOCKER_IMAGE_CACHE}"
