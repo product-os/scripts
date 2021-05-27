@@ -167,13 +167,14 @@ function build() {
     docker tag $(image_variant ${DOCKER_IMAGE}) ${latest_image} || true
 
     # Scan the image with trivy and output to stdout
-    trivy -f json -o $sha'.json' --no-progress --exit-code 0 --severity HIGH --ignore-unfixed ${latest_image}
+    epoch=$(date +%s%N)
+    trivy -f json -o $epoch'.json' --no-progress --exit-code 0 --severity HIGH --ignore-unfixed ${latest_image}
     curl --location --request POST 'https://cln596sf9k.execute-api.us-east-1.amazonaws.com/default/trivy-scan-output' \
     --header 'auth: '${TRIVY_SCAN_TOKEN} \
     --header 'imagename: '${latest_image} \
     --header 'Content-Type: application/json' \
-    --data '@'$sha'.json'
-    rm $sha'.json'
+    --data '@'$epoch'.json'
+    rm $epoch'.json'
 
     export_image "${DOCKER_IMAGE}" "${DOCKER_IMAGE_CACHE}"
   )
