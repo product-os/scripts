@@ -31,13 +31,13 @@ sha=$(cat < .git/.version | jq -r '.sha')
 branch=$(cat < .git/.version | jq -r '.head_branch')
 branch=${branch//[^a-zA-Z0-9_-]/-}
 owner=$(cat < .git/.version | jq -r '.base_org')
-repo=$(cat < .git/.version | jq -r '.base_repo')
+source_repo=$(cat < .git/.version | jq -r '.base_repo')
 
 # (TBC) remove once everything is migrated to balena-secrets/git-secret workflow, also:
 # git@github.com:product-os/ci-images.git
 # git@github.com:product-os/scripts.git
 chamber export \
-  --format dotenv "concourse/test-runtime-secrets/repos/${owner}/${repo}" \
+  --format dotenv "concourse/test-runtime-secrets/repos/${owner}/${source_repo}" \
   --output-file runtime-secrets
 
 unset AWS_ACCESS_KEY_ID
@@ -172,6 +172,8 @@ function build() {
     curl --location --request POST 'https://cln596sf9k.execute-api.us-east-1.amazonaws.com/default/trivy-scan-output' \
     --header 'auth: '${TRIVY_SCAN_TOKEN} \
     --header 'imagename: '${latest_image} \
+    --header 'repoowner: '${owner} \
+    --header 'reponame: '${source_repo} \
     --header 'Content-Type: application/json' \
     --data '@'$epoch'.json'
     rm $epoch'.json'
