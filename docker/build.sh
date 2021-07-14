@@ -1,8 +1,20 @@
 #!/usr/bin/env bash
 
+##############################################################
+#                                                            #
+# !!! [ShellCheck](https://www.shellcheck.net/) YOUR WORK!!! #
+#                                                            #
+#                  (please and thank you)                    #
+#                                                            #
+##############################################################
+
+
+docker_registry_mirror=${DOCKER_REGISTRY_MIRROR:-https://registry-cache-internal.balena-cloud.com}
+export docker_registry_mirror
+
 # shellcheck disable=SC1091
 source /docker-lib.sh
-start_docker
+start_docker "" "${docker_registry_mirror}"
 
 docker --version
 
@@ -17,7 +29,7 @@ set -u
 [[ "${DEBUG}" == "false" ]] || set -x
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-# shellcheck disable=SC1090
+# shellcheck disable=SC1091
 source "${HERE}/image-cache.sh"
 
 CONCOURSE_WORKDIR=$(pwd)
@@ -38,7 +50,7 @@ source_repo=$(cat < .git/.version | jq -r '.base_repo')
 # git@github.com:product-os/scripts.git
 chamber export \
   --format dotenv "concourse/test-runtime-secrets/repos/${owner}/${source_repo}" \
-  --output-file runtime-secrets
+  --output-file runtime-secrets || true
 
 unset AWS_ACCESS_KEY_ID
 unset AWS_SECRET_ACCESS_KEY
@@ -164,19 +176,19 @@ function build() {
       -t "${DOCKER_IMAGE}" \
       -f "${DOCKERFILE}" .
 
-    docker tag $(image_variant ${DOCKER_IMAGE}) ${latest_image} || true
+    docker tag "$(image_variant "${DOCKER_IMAGE}")" "${latest_image}" || true
 
     # Scan the image with trivy and output to stdout
     epoch=$(date +%s%N)
-    trivy -f json -o $epoch'.json' --no-progress --exit-code 0 --severity HIGH --ignore-unfixed -timeout 1m ${latest_image} || true
+    trivy -f json -o "${epoch}.json" --no-progress --exit-code 0 --severity HIGH --ignore-unfixed -timeout 1m "${latest_image}" || true
     curl --location --request POST 'https://cln596sf9k.execute-api.us-east-1.amazonaws.com/default/trivy-scan-output' \
-    --header 'auth: '${TRIVY_SCAN_TOKEN} \
-    --header 'imagename: '${latest_image} \
-    --header 'repoowner: '${owner} \
-    --header 'reponame: '${source_repo} \
+    --header "auth: ${TRIVY_SCAN_TOKEN}" \
+    --header "imagename: ${latest_image}" \
+    --header "repoowner: ${owner}" \
+    --header "reponame: ${source_repo}" \
     --header 'Content-Type: application/json' \
-    --data '@'$epoch'.json'
-    rm $epoch'.json'
+    --data "@${epoch}.json"
+    rm "${epoch}.json"
 
     export_image "${DOCKER_IMAGE}" "${DOCKER_IMAGE_CACHE}"
   )
