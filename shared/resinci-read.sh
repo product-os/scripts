@@ -60,7 +60,7 @@ if [ ! -f ${RESINCI_JSON} ]; then
   exit
 fi
 
-VALUE="$(yq r -j ${RESINCI_JSON} | jq -r ".[\"${ARGV_PIPELINE}\"].${ARGV_PROPERTY}")"
+VALUE="$(yq e -j ${RESINCI_JSON} | jq -r ".[\"${ARGV_PIPELINE}\"].${ARGV_PROPERTY}")"
 
 if [ "$VALUE" = "null" ]; then
   VALUE=""

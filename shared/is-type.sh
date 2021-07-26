@@ -10,7 +10,7 @@ set -u
 pushd $ARGV_DIRECTORY
 
 if [ -f repo.yml ]; then
-  REPO_TYPE=$(yq read repo.yml 'type')
+  REPO_TYPE=$(yq e repo.yml 'type')
 fi
 
 [[ $REPO_TYPE == $ARGV_TYPE ]] && exit 0
