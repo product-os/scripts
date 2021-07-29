@@ -16,7 +16,7 @@ should_run="$(${HERE}/scripts/shared/resinci-read.sh \
 [[ "${should_run}" == "true" ]] && exit
 [[ "${should_run}" == "false" ]] && exit 1
 if [[ -f "repo.yml" ]]; then
-  project_type="$(yq e repo.yml 'type')"
+  project_type="$(yq e '.type' repo.yml)"
   # If project type is node-cli we still might want to publish to npm
   [[ "$project_type" == "node-cli" ]] && exit 0
   # If project type is not node, exit 1

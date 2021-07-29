@@ -24,7 +24,7 @@ rebase_branch() {
 pushd $ARGV_DIRECTORY
 
 if [ -f repo.yml ]; then
-	should_rebase=$(yq e repo.yml 'autoRebase')
+	should_rebase=$(yq e '.autoRebase' repo.yml)
 
 	if [ "$should_rebase" == "false" ]; then
 		echo "Opting out of auto rebase"

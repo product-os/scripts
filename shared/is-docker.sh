@@ -18,7 +18,7 @@ should_run="$(${HERE}/scripts/shared/resinci-read.sh \
 [[ "${should_run}" == "false" ]] && exit 1
 
 if [[ -f "repo.yml" ]]; then
-  project_type="$(yq e repo.yml 'type')"
+  project_type="$(yq e '.type' repo.yml)"
   # All of these types will still have a Dockerfile, but
   # should not trigger this check
   [[ "$project_type" == "generic" ]] && exit 1

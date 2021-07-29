@@ -21,8 +21,8 @@ headRepo=$(jq -r '.head_repo' .git/.version)
 headOwner=$(jq -r '.head_org' .git/.version)
 headBranch=$(jq -r '.head_branch' .git/.version)
 
-version="$(yq e repo.yml 'esr.version').0"
-lines="$(yq e repo.yml 'esr.line')"
+version="$(yq e '.esr.version' repo.yml).0"
+lines="$(yq e '.esr.line' repo.yml)"
 sed "4i# ${version}\n## ($(date +%F))\n\n* Declared ESR ${line}\n" CHANGELOG.md
 echo ${version} > VERSION
 
