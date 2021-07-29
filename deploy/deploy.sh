@@ -13,7 +13,7 @@ version=${taggedVersion:1}
 
 [[ -f repo.yml ]] || exit 1
 
-[[ "$(yq e repo.yml 'type')" == "product" ]] || exit 1
+[[ "$(yq e '.type' repo.yml)" == "product" ]] || exit 1
 
 keyframe=$(find .versionbot/contracts -type f -name ${version}.*)
 if [ "$keyframe" == "" ]; then

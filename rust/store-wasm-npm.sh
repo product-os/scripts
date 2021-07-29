@@ -11,7 +11,7 @@ HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 pushd $ARGV_DIRECTORY
 
 # Exit early if wasm should not be published
-[[ "$(yq e repo.yml 'type')" == "rust-public-crate-wasm" ]] || exit 0
+[[ "$(yq e '.type' repo.yml)" == "rust-public-crate-wasm" ]] || exit 0
 
 headBranch=$(jq -r '.head_branch' .git/.version)
 version=$(jq -r '.componentVersion' .git/.version)

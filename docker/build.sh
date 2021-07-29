@@ -228,7 +228,7 @@ if [ -n "$builds" ]; then
   done
 else
   if [ -f .resinci.yml ]; then
-    publish=$(yq e .resinci.yml 'docker.publish')
+    publish=$(yq e '.docker.publish' .resinci.yml)
   else
     publish=true
   fi
@@ -240,7 +240,7 @@ fi
 echo "========== Build finished =========="
 
 if [ -f docker-compose.test.yml ] && [ -f docker-compose.yml ]; then
-  sut=$(yq e repo.yml 'sut')
+  sut=$(yq e '.sut' repo.yml)
   if [ "${sut}" == "null" ]; then
     sut="sut"
   fi
