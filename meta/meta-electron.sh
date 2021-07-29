@@ -17,7 +17,7 @@ pushd ${ARGV_DIRECTORY}
 
 baseRepo=$(jq -r '.base_repo' .git/.version)
 baseOrg=$(jq -r '.base_org' .git/.version)
-editVersion=$(yq read repo.yml 'triggerNotification.version')
-stagingP=$(yq read repo.yml 'triggerNotification.stagingPercentage')
+editVersion=$(yq e repo.yml 'triggerNotification.version')
+stagingP=$(yq e repo.yml 'triggerNotification.stagingPercentage')
 
 resinci-deploy editLatest github-release -r ${baseRepo} -o ${baseOrg} -v ${editVersion} -p ${stagingP}

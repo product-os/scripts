@@ -14,7 +14,7 @@ cd "$ARGV_DIRECTORY"
 [[ -f Dockerfile ]] && exit 0
 [[ -f .resinci.yml ]] || exit 1
 
-BUILD_COUNT="$(yq r -j .resinci.yml | jq -r '.docker.builds | length')"
+BUILD_COUNT="$(yq e -j .resinci.yml | jq -r '.docker.builds | length')"
 [[ ${BUILD_COUNT} -gt 0 ]] && exit 0
 
 exit 1

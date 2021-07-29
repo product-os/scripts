@@ -18,7 +18,7 @@ number=$(jq -r '.number' .git/.version)
 [[ "${base}" == "master" ]] && exit 0
 
 # Check if the branch is or is being declared as ESR
-esr="$(yq r repo.yml 'esr.version')"
+esr="$(yq e repo.yml 'esr.version')"
 [[ "${esr}" != "null" ]] && exit 0
 
 # Otherwise we check if a meta footer exists, and fail if not

@@ -7,7 +7,7 @@ ARGV_DIRECTORY="$1"
 pushd "$ARGV_DIRECTORY"
 
 [[ -f repo.yml ]] || exit 0
-backports=$(yq r repo.yml 'backports')
+backports=$(yq e repo.yml 'backports')
 
 if [ "${backports}" == "null" ]; then
   echo "No backports defined"
@@ -41,7 +41,7 @@ git stash
 for backport_line in ${backport_lines//,/ }
 do
   echo "target=${backport_line}"
-  backport_branch="$(yq r repo.yml "backports.${backport_line}")"
+  backport_branch="$(yq e repo.yml "backports.${backport_line}")"
   if [ "$backport_branch" == "null" ]; then
     continue
   fi

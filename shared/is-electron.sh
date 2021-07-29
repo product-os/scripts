@@ -10,6 +10,6 @@ pushd ${ARGV_DIRECTORY}
 
 [[ -f repo.yml ]] || exit 1
 
-[[ "$(yq read repo.yml 'type')" == "electron" ]] || exit 1
+[[ "$(yq e repo.yml 'type')" == "electron" ]] || exit 1
 # If we made it through the checks, exit successfully
 exit 0

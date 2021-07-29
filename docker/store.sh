@@ -96,7 +96,7 @@ if [ -n "$builds" ]; then
 
 else
   if [ -f .resinci.yml ]; then
-    publish=$(yq r .resinci.yml 'docker.publish')
+    publish=$(yq e .resinci.yml 'docker.publish')
   else
     publish=true
   fi

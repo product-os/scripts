@@ -18,7 +18,7 @@ should_run="$(${HERE}/scripts/shared/resinci-read.sh \
 [[ "${should_run}" == "false" ]] && exit 1
 
 if [[ -f "repo.yml" ]]; then
-  project_type="$(yq read repo.yml 'type')"
+  project_type="$(yq e repo.yml 'type')"
   # All of these types will still have a Dockerfile, but
   # should not trigger this check
   [[ "$project_type" == "generic" ]] && exit 1
@@ -32,7 +32,7 @@ fi
 
 [[ -f .resinci.yml ]] || exit 1
 
-build_count=$(yq r -j .resinci.yml | jq -r '.docker.builds | length')
+build_count=$(yq e -j .resinci.yml | jq -r '.docker.builds | length')
 
 [[ ${build_count} -gt 0 ]] && exit 0
 
