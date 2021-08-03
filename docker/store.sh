@@ -26,34 +26,17 @@ set -u
 
 [[ "${DEBUG}" == "false" ]] || set -x
 
-function image_variant() {
-  local docker_image
-  docker_image=$1
-  local docker_tag
-  docker_tag=${2:-default}
-
-  if [[ "${docker_tag}" == 'default' ]]; then
-    echo "${docker_image}"
-    return
-  fi
-
-  image_variant="$(echo "${docker_image}" | awk -F':' '{print $2}')"
-  docker_image="$(echo "${docker_image}" | awk -F':' '{print $1}')"
-
-  if [[ "${image_variant}" == '' ]]; then
-    echo "${docker_image}:${docker_tag}"
-  else
-    echo "${docker_image}:${image_variant}-${docker_tag}"
-  fi
-}
-
 store_image() {
   local image="$1"
-  docker tag "$(image_variant "${image}")" "$(image_variant "${image}" "${sha}")"
-  docker tag "$(image_variant "${image}")" "$(image_variant "${image}" "${branch_tag}")"
 
-  docker push "$(image_variant "${image}" "${sha}")"
-  docker push "$(image_variant "${image}" "${branch_tag}")"
+  sha_image="$(image_variant "${image}" "${sha}")"
+  branch_image="$(image_variant "${image}" "${branch_tag}")"
+  # master_image="$(image_variant "${image}" master)"
+  # latest_image="$(image_variant "${image}" latest)"
+  output_tar="$(sanitise_image_name "${branch_image}").tar"
+
+  skopeo copy --format v2s2 --all "oci-archive:${DOCKER_IMAGE_CACHE}/${output_tar}" "docker://${sha_image}"
+  skopeo copy --format v2s2 --all "oci-archive:${DOCKER_IMAGE_CACHE}/${output_tar}" "docker://${branch_image}"
 }
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -81,16 +64,15 @@ if [ -n "$builds" ]; then
   for build in ${builds}; do
     echo "${build}"
     publish=$( (echo "${build}" | jq -r '.publish') || echo true )
-
     repo=$(echo "${build}" | jq -r '.docker_repo')
-    if [ "$repo" == "null" ]; then
+
+    if [ "${repo}" == "null" ]; then
         repo="${base_org}/${base_repo}"
-        echo "WARNING!!! .docker repo not set. Using '$repo' as repo"
+        echo "WARNING!!! .docker repo not set. Using '${repo}' as repo"
     fi
 
-    if [ "$publish" != "false" ]; then
-      import_image "$repo" "${DOCKER_IMAGE_CACHE}"
-      store_image "$repo"
+    if [ "${publish}" != "false" ]; then
+      store_image "${repo}"
     fi
   done
 
@@ -102,7 +84,6 @@ else
   fi
 
   if [ "$publish" != "false" ]; then
-    import_image "${base_org}/${base_repo}" "${DOCKER_IMAGE_CACHE}"
     store_image "${base_org}/${base_repo}"
   fi
 
