@@ -180,7 +180,7 @@ function build() {
 
     # Scan the image with trivy and output to stdout
     epoch=$(date +%s%N)
-    trivy -f json -o "${epoch}.json" --no-progress --exit-code 0 --severity HIGH --ignore-unfixed -timeout 1m "${latest_image}" || true
+    trivy -f json -o "${epoch}.json" --no-progress --exit-code 0 --severity HIGH --ignore-unfixed -timeout 5m "${latest_image}" || echo "ignoring trivy failure"
     curl --location --request POST 'https://cln596sf9k.execute-api.us-east-1.amazonaws.com/default/trivy-scan-output' \
     --header "auth: ${TRIVY_SCAN_TOKEN}" \
     --header "imagename: ${latest_image}" \
