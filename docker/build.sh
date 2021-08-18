@@ -88,34 +88,10 @@ fi
 # any ongoing builds on the VM (that could result in `exec format error`).
 docker run --rm --privileged multiarch/qemu-user-static:5.2.0-2 -p yes
 
-function image_variant() {
-  local docker_image
-  docker_image=$1
-  local docker_tag
-  docker_tag=${2:-default}
-
-  if [[ "${docker_tag}" == 'default' ]]; then
-    echo "${docker_image}"
-    return
-  fi
-
-  local image_variant
-  image_variant="$(echo "${docker_image}" | awk -F':' '{print $2}')"
-  local docker_image
-  docker_image="$(echo "${docker_image}" | awk -F':' '{print $1}')"
-
-  if [[ "${image_variant}" == '' ]]; then
-    echo "${docker_image}:${docker_tag}"
-  else
-    echo "${docker_image}:${image_variant}-${docker_tag}"
-  fi
-}
-
-function is_buildx() {
-    [[ ${DOCKER_BUILDKIT} -eq 1 ]] \
-      && [[ "${DOCKER_CLI_EXPERIMENTAL}" == 'enabled' ]] \
-      && docker buildx version
-}
+# create fresh buildx builder instance
+docker buildx create --driver docker-container --use
+# force build container creation to avoid unique name generation issues
+echo "FROM scratch" | docker buildx build -
 
 function build_with_opts() {
     local dockerfile=$1; shift
@@ -124,19 +100,11 @@ function build_with_opts() {
 
     # multistage build handling
     for stage in ${build_stages}; do
-        if is_buildx; then
-            docker buildx build --target "${stage}" "$@"
-        else
-            docker build --target "${stage}" "$@"
-        fi
+      docker buildx build --target "${stage}" "$@"
     done
 
     # single-stage build handling and runtime stage
-    if is_buildx; then
-        docker buildx build "$@"
-    else
-        docker build "$@"
-    fi
+    docker buildx build "$@"
 }
 
 function build() {
@@ -146,51 +114,71 @@ function build() {
   publish=$1; shift
   args=$1; shift
   secrets=$1; shift
-  sha_image=$(image_variant "${DOCKER_IMAGE}" "${sha}")
-  branch_image=$(image_variant "${DOCKER_IMAGE}" "build-${branch}")
-  master_image=$(image_variant "${DOCKER_IMAGE}" master)
-  latest_image=$(image_variant "${DOCKER_IMAGE}" latest)
+  platforms=$1; shift
+
+  sha_image="$(image_variant "${DOCKER_IMAGE}" "${sha}")"
+  branch_image="$(image_variant "${DOCKER_IMAGE}" "build-${branch}")"
+  master_image="$(image_variant "${DOCKER_IMAGE}" master)"
+  latest_image="$(image_variant "${DOCKER_IMAGE}" latest)"
+  output_tar="$(sanitise_image_name "${branch_image}").tar"
+
+  # convert platforms to an array
+  if [ -n "${platforms}" ]
+  then
+    platforms=(--platform "${platforms}")
+  else
+    platforms=()
+  fi
+
+  cache_from=()
+  for image in "${sha_image}" "${branch_image}" "${master_image}" "${latest_image}"
+  do
+    cache_from+=(--cache-from "${image}")
+  done
 
   (
     cd "${path}"
-
-    if [ "${publish}" != "false" ]; then
-      docker pull "${sha_image}" || true
-      docker pull "${branch_image}" || true
-      docker pull "${master_image}" || true
-    fi
 
     # shellcheck disable=SC2086
     build_with_opts \
       "${DOCKERFILE}" \
       --progress=plain \
-      --cache-from "${sha_image}" \
-      --cache-from "${branch_image}" \
-      --cache-from "${master_image}" \
+      "${cache_from[@]}" \
       ${args} \
       --build-arg RESINCI_REPO_COMMIT="${sha}" \
       --build-arg CI=true \
       --build-arg NPM_TOKEN="${NPM_TOKEN}" \
       ${secrets} \
+      "${platforms[@]}" \
       --secret id=npmtoken,src="${tmptoken}" \
-      -t "${DOCKER_IMAGE}" \
-      -f "${DOCKERFILE}" .
+      --file "${DOCKERFILE}" . \
+      --output "type=oci,dest=${output_tar}"
 
-    docker tag "$(image_variant "${DOCKER_IMAGE}")" "${latest_image}" || true
+    # load the native platform (amd64) image to the local daemon for testing
+    skopeo copy "oci-archive:${output_tar}" "docker-daemon:${branch_image}"
 
     # Scan the image with trivy and output to stdout
     epoch=$(date +%s%N)
-    trivy -f json -o "${epoch}.json" --no-progress --exit-code 0 --severity HIGH --ignore-unfixed -timeout 1m "${latest_image}" || true
+    trivy -f json -o "${epoch}.json" \
+      --no-progress \
+      --exit-code 0 \
+      --severity HIGH \
+      --ignore-unfixed \
+      -timeout 1m \
+      "${branch_image}" || echo "ignoring trivy failure"
     curl --location --request POST 'https://cln596sf9k.execute-api.us-east-1.amazonaws.com/default/trivy-scan-output' \
-    --header "auth: ${TRIVY_SCAN_TOKEN}" \
-    --header "imagename: ${latest_image}" \
-    --header "repoowner: ${owner}" \
-    --header "reponame: ${source_repo}" \
-    --header 'Content-Type: application/json' \
-    --data "@${epoch}.json"
+      --header "auth: ${TRIVY_SCAN_TOKEN}" \
+      --header "imagename: ${latest_image}" \
+      --header "repoowner: ${owner}" \
+      --header "reponame: ${source_repo}" \
+      --header 'Content-Type: application/json' \
+      --data "@${epoch}.json"
     rm "${epoch}.json"
 
-    export_image "${DOCKER_IMAGE}" "${DOCKER_IMAGE_CACHE}"
+    if [ "$publish" != "false" ]; then
+      cp -v "${output_tar}" "${DOCKER_IMAGE_CACHE}/${output_tar}"
+    fi
+    rm "${output_tar}"
   )
 }
 
@@ -210,13 +198,14 @@ if [ -n "$builds" ]; then
     publish=$(echo "${build}" | jq -r '.publish' || echo true)
     args=$(echo "${build}" | jq -r '.args // [] | map("--build-arg " + .) | join(" ")' || echo "")
     secrets=$(echo "${build}" | jq -r '.secrets // [] | map("--secret id=" + .id + "," + "src=" + .src) | join(" ")' || echo "")
+    platforms="$(echo "${build}" | jq -r '.platforms // [] | join(",")' || echo "")"
 
     if [ "$repo" == "null" ]; then
       echo "docker_repo must be set for every image. The value should be unique across the images in builds"
       exit 1
     fi
 
-    build "${path}" "${dockerfile}" "${repo}" "${publish}" "${args}" "${secrets}" &
+    build "${path}" "${dockerfile}" "${repo}" "${publish}" "${args}" "${secrets}" "${platforms}" &
     build_pids+=($!)
   done
   # Waiting on a specific PID makes the wait command return with the exit
@@ -234,7 +223,7 @@ else
   fi
 
   # build default (no .resinci.yml)
-  build . Dockerfile "$(cat < .git/.version | jq -r '.base_org + "/" + .base_repo')" "${publish}" "" ""
+  build . Dockerfile "$(cat < .git/.version | jq -r '.base_org + "/" + .base_repo')" "${publish}" "" "" ""
 fi
 
 echo "========== Build finished =========="
