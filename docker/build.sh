@@ -122,18 +122,17 @@ function build() {
   latest_image="$(image_variant "${DOCKER_IMAGE}" latest)"
   output_tar="$(sanitise_image_name "${branch_image}").tar"
 
-  # convert platforms to an array
+  # read platforms to an array
+  platform_arr=()
   if [ -n "${platforms}" ]
   then
-    platforms=(--platform "${platforms}")
-  else
-    platforms=()
+    platform_arr=(--platform "${platforms}")
   fi
 
-  cache_from=()
+  cache_from_arr=()
   for image in "${sha_image}" "${branch_image}" "${master_image}" "${latest_image}"
   do
-    cache_from+=(--cache-from "${image}")
+    cache_from_arr+=(--cache-from "${image}")
   done
 
   (
@@ -143,19 +142,19 @@ function build() {
     build_with_opts \
       "${DOCKERFILE}" \
       --progress=plain \
-      "${cache_from[@]}" \
+      "${cache_from_arr[@]}" \
       ${args} \
       --build-arg RESINCI_REPO_COMMIT="${sha}" \
       --build-arg CI=true \
       --build-arg NPM_TOKEN="${NPM_TOKEN}" \
       ${secrets} \
-      "${platforms[@]}" \
+      "${platform_arr[@]}" \
       --secret id=npmtoken,src="${tmptoken}" \
       --file "${DOCKERFILE}" . \
       --output "type=oci,dest=${output_tar}"
 
     # load the native platform (amd64) image to the local daemon for testing
-    skopeo copy "oci-archive:${output_tar}" "docker-daemon:${branch_image}"
+    skopeo copy "oci-archive:${output_tar}" "docker-daemon:${latest_image}"
 
     # Scan the image with trivy and output to stdout
     epoch=$(date +%s%N)
@@ -165,7 +164,7 @@ function build() {
       --severity HIGH \
       --ignore-unfixed \
       -timeout 1m \
-      "${branch_image}" || echo "ignoring trivy failure"
+      "${latest_image}" || echo "ignoring trivy failure"
     curl --location --request POST 'https://cln596sf9k.execute-api.us-east-1.amazonaws.com/default/trivy-scan-output' \
       --header "auth: ${TRIVY_SCAN_TOKEN}" \
       --header "imagename: ${latest_image}" \
