@@ -58,8 +58,8 @@ else
   npx "npm@$ARGV_NPM_VERSION" shrinkwrap --dev
 fi
 # We want to ignore the version bump in npm-shrinkwrap that happens on the CI
-oldShrink=$(git show HEAD:${SHRINKWRAP_FILE} | jq "del(.version)")
-newShrink=$(jq "del(.version)" ${SHRINKWRAP_FILE})
+oldShrink=$(git show HEAD:${SHRINKWRAP_FILE} | jq -S "del(.version)")
+newShrink=$(jq -S "del(.version)" ${SHRINKWRAP_FILE})
 
 echo "$oldShrink" > shrinkwrap.old.tmp
 echo "$newShrink" > shrinkwrap.new.tmp
