@@ -164,7 +164,7 @@ function build() {
       --severity HIGH \
       --ignore-unfixed \
       -timeout 1m \
-      "${latest_image}" || echo "ignoring trivy failure"
+      "${latest_image}" || echo "Ignoring trivy call failure"
     curl --location --request POST 'https://cln596sf9k.execute-api.us-east-1.amazonaws.com/default/trivy-scan-output' \
       --header "auth: ${TRIVY_SCAN_TOKEN}" \
       --header "imagename: ${latest_image}" \
@@ -172,7 +172,7 @@ function build() {
       --header "reponame: ${source_repo}" \
       --header 'Content-Type: application/json' \
       --data "@${epoch}.json"
-    rm "${epoch}.json"
+    rm "${epoch}.json" || echo "Ignoring missing trivy file failure"
 
     if [ "$publish" != "false" ]; then
       cp -v "${output_tar}" "${DOCKER_IMAGE_CACHE}/${output_tar}"
