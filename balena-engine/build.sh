@@ -45,4 +45,4 @@ mkdir -p "/go/src/${ARGV_GO_PKG}"
 cp -Lr "${ARGV_BASE_DIRECTORY}/." "/go/src/${ARGV_GO_PKG}/"
 pushd "/go/src/${ARGV_GO_PKG}" >/dev/null
 
-hack/make.sh dynbinary-balena
+hack/make.sh dynbinary
