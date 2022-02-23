@@ -13,4 +13,7 @@ popd
 
 pushd $ARGV_DIRECTORY
 
-rfq generate . -o ../outputs
+prNumber=$(jq -r '.number' .git/.version)
+commitID=$(jq -r '.sha' .git/.version)
+
+rfq generate . -o ../outputs -r ${prNumber} -c ${commitID}
