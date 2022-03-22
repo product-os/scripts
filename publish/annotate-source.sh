@@ -4,7 +4,7 @@ set -e
 ARGV_DIRECTORY="$1"
 set -u
 
-[[ "${DEBUG}" == "false" ]] || set -x
+set -x
 
 pushd $ARGV_DIRECTORY
 
