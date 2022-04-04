@@ -31,7 +31,9 @@ output=$(resinci-deploy store github-release "${ASSETS}" \
   -o ${org} \
   -v ${version})
 
-RELEASE_URL=$( grep -nri -A 10 'Published draft release:' <<< "$output" | grep html_url -A 1 | grep -e "[\'\"]" )
+# Print output of resinci-deploy
+echo $output
+RELEASE_URL=$(grep -o -E https://github.com/$org/$repo/releases/tag/untagged-"[a-z0-9]{20}" <<< "$output" | tail -1)
 
 SUBJECT='{"ownerName":"'${org}'", "repoName":"'${repo}'", "branch":"'${headBranch}'", "installationId":15652884}'
 BODY='Please use the release found at -'
