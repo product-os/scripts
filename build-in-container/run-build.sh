@@ -14,7 +14,7 @@ export docker_registry_mirror
 
 # shellcheck disable=SC1091
 source /docker-lib.sh
-start_docker "" "${docker_registry_mirror}"
+start_docker 3 5 "" "${docker_registry_mirror}"
 
 set -e
 ARGV_DIRECTORY="$1"
