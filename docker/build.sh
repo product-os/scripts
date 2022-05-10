@@ -152,7 +152,7 @@ function build() {
 
     # Scan the image with trivy and output to stdout
     epoch=$(date +%s%N)
-    trivy -f json -o "${epoch}.json" \
+    trivy image -f json -o "${epoch}.json" \
       --no-progress \
       --exit-code 0 \
       --severity HIGH \
