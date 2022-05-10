@@ -157,7 +157,7 @@ function build() {
       --exit-code 0 \
       --severity HIGH \
       --ignore-unfixed \
-      -timeout 1m \
+      --timeout 10m \
       "${latest_image}" || echo "Ignoring trivy call failure"
     curl --location --request POST 'https://cln596sf9k.execute-api.us-east-1.amazonaws.com/default/trivy-scan-output' \
       --header "auth: ${TRIVY_SCAN_TOKEN}" \
