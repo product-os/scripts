@@ -183,7 +183,7 @@ builds=($("${HERE}/../shared/resinci-read.sh" \
 
 if [ -n "$builds" ]; then
   for context in ${builds}; do
-    build_pids=()
+    # build_pids=()
     build_context=("$(echo "${context}" | jq -rc '.[]')")
     for build in ${build_context}; do
       echo "build: ${build}"
@@ -200,16 +200,16 @@ if [ -n "$builds" ]; then
         exit 1
       fi
 
-      build "${build_path}" "${dockerfile}" "${repo}" "${publish}" "${args}" "${secrets}" "${platforms}" &
-      build_pids+=($!)
+      build "${build_path}" "${dockerfile}" "${repo}" "${publish}" "${args}" "${secrets}" "${platforms}" #&
+      # build_pids+=($!)
     done
     # Waiting on a specific PID makes the wait command return with the exit
     # status of that process. Because of the 'set -e' setting, any exit status
     # other than zero causes the current shell to terminate with that exit
     # status as well.
-    for pid in "${build_pids[@]}"; do
-      wait "$pid"
-    done
+    # for pid in "${build_pids[@]}"; do
+    #   wait "$pid"
+    # done
   done
 else
   if [ -f .resinci.yml ]; then
