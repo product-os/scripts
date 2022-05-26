@@ -175,7 +175,7 @@ function build() {
   )
 }
 
-max_parallel_builds=4
+max_parallel_builds=2
 
 # Read the details of what we should build from .resinci.yml
 builds=$("${HERE}/../shared/resinci-read.sh" \
