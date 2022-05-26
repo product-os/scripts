@@ -176,15 +176,15 @@ function build() {
 }
 
 # Read the details of what we should build from .resinci.yml
-read -ra builds "$("${HERE}/../shared/resinci-read.sh" \
+builds=($("${HERE}/../shared/resinci-read.sh" \
   -b "$(pwd)" \
   -l docker \
-  -p builds | jq -c 'group_by(.path)[]')"
+  -p builds | jq -c 'group_by(.path)[]'))
 
 if [ -n "$builds" ]; then
   for context in ${builds}; do
     build_pids=()
-    read -ra build_context "$(echo "${context}" | jq -rc '.[]')"
+    build_context=("$(echo "${context}" | jq -rc '.[]')")
     for build in ${build_context}; do
       echo "build: ${build}"
       repo=$(echo "${build}" | jq -r '.docker_repo')
