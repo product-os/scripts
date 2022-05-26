@@ -176,40 +176,28 @@ function build() {
 }
 
 # Read the details of what we should build from .resinci.yml
-builds=($("${HERE}/../shared/resinci-read.sh" \
+builds=$("${HERE}/../shared/resinci-read.sh" \
   -b "$(pwd)" \
   -l docker \
-  -p builds | jq -c 'group_by(.path)[]'))
+  -p builds | jq -c '.[]')
 
 if [ -n "$builds" ]; then
-  for context in ${builds}; do
-    # build_pids=()
-    build_context=("$(echo "${context}" | jq -rc '.[]')")
-    for build in ${build_context}; do
-      echo "build: ${build}"
-      repo=$(echo "${build}" | jq -r '.docker_repo')
-      dockerfile=$(echo "${build}" | jq -r '.dockerfile' || echo Dockerfile)
-      build_path=$(echo "${build}" | jq -r '.path' || echo .)
-      publish=$(echo "${build}" | jq -r '.publish' || echo true)
-      args=$(echo "${build}" | jq -r '.args // [] | map("--build-arg " + .) | join(" ")' || echo "")
-      secrets=$(echo "${build}" | jq -r '.secrets // [] | map("--secret id=" + .id + "," + "src=" + .src) | join(" ")' || echo "")
-      platforms="$(echo "${build}" | jq -r '.platforms // [] | join(",")' || echo "")"
+  for build in ${builds}; do
+    echo "${build}"
+    repo=$(echo "${build}" | jq -r '.docker_repo')
+    dockerfile=$(echo "${build}" | jq -r '.dockerfile' || echo Dockerfile)
+    path=$(echo "${build}" | jq -r '.path' || echo .)
+    publish=$(echo "${build}" | jq -r '.publish' || echo true)
+    args=$(echo "${build}" | jq -r '.args // [] | map("--build-arg " + .) | join(" ")' || echo "")
+    secrets=$(echo "${build}" | jq -r '.secrets // [] | map("--secret id=" + .id + "," + "src=" + .src) | join(" ")' || echo "")
+    platforms="$(echo "${build}" | jq -r '.platforms // [] | join(",")' || echo "")"
 
-      if [ -z "$repo" ]; then
-        echo "docker_repo must be set for every image. The value should be unique across the images in builds"
-        exit 1
-      fi
+    if [ "$repo" == "null" ]; then
+      echo "docker_repo must be set for every image. The value should be unique across the images in builds"
+      exit 1
+    fi
 
-      build "${build_path}" "${dockerfile}" "${repo}" "${publish}" "${args}" "${secrets}" "${platforms}" #&
-      # build_pids+=($!)
-    done
-    # Waiting on a specific PID makes the wait command return with the exit
-    # status of that process. Because of the 'set -e' setting, any exit status
-    # other than zero causes the current shell to terminate with that exit
-    # status as well.
-    # for pid in "${build_pids[@]}"; do
-    #   wait "$pid"
-    # done
+    build "${path}" "${dockerfile}" "${repo}" "${publish}" "${args}" "${secrets}" "${platforms}"
   done
 else
   if [ -f .resinci.yml ]; then
