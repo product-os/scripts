@@ -184,7 +184,6 @@ builds=$("${HERE}/../shared/resinci-read.sh" \
   -p builds | jq -c '.[]')
 
 if [ -n "$builds" ]; then
-  build_pids=()
   for build in ${builds}; do
     echo "${build}"
     repo=$(echo "${build}" | jq -r '.docker_repo')
@@ -200,23 +199,7 @@ if [ -n "$builds" ]; then
       exit 1
     fi
 
-    build "${path}" "${dockerfile}" "${repo}" "${publish}" "${args}" "${secrets}" "${platforms}" &
-    build_pids+=($!)
-
-    # Waiting on a specific PID makes the wait command return with the exit
-    # status of that process. Because of the 'set -e' setting, any exit status
-    # other than zero causes the current shell to terminate with that exit
-    # status as well.
-    # Limit maximum parallel builds to max_parallel_builds
-    if [ "${#build_pids[@]}" -eq "${max_parallel_builds}" ]; then
-      for pid in "${build_pids[@]}"; do
-        wait "$pid"
-      done
-      build_pids=()
-    fi
-  done
-  for pid in "${build_pids[@]}"; do
-    wait "$pid"
+    build "${path}" "${dockerfile}" "${repo}" "${publish}" "${args}" "${secrets}" "${platforms}"
   done
 else
   if [ -f .resinci.yml ]; then
