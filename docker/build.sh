@@ -209,12 +209,14 @@ if [ -n "$builds" ]; then
     # status as well.
     # Limit maximum parallel builds to max_parallel_builds
     if [ "${#build_pids[@]}" -eq "${max_parallel_builds}" ]; then
-      echo "They are equal!"
       for pid in "${build_pids[@]}"; do
         wait "$pid"
       done
       build_pids=()
     fi
+  done
+  for pid in "${build_pids[@]}"; do
+    wait "$pid"
   done
 else
   if [ -f .resinci.yml ]; then
