@@ -4,6 +4,15 @@ echo "TASKINFO: Build the application in BalenaCloud"
 set -e
 SRC_PATH="$1"
 
+# hard stop if disabled
+if [[ -f "${SRC_PATH}/.resinci.yml" ]]; then
+    disabled="$(cat < "${SRC_PATH}/.resinci.yml" | yq e - -j | jq -r .disabled)"
+    if [[ -n $disabled ]] && [[ $disabled =~ true|True|1|Yes|yes|On|on ]]; then
+        echo "task|step disabled=${disabled} in .resinci.yml"
+        exit 1
+    fi
+fi
+
 # https://git-secret.io/
 if [[ -n ${GPG_PRIVATE_KEY} ]] && [[ -n ${GPG_PASSPHRASE} ]] \
   && which gpg2 && git secret --version; then

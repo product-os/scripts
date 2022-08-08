@@ -16,6 +16,8 @@
 # limitations under the License.
 ###
 
+[[ $VERBOSE =~ On|On|true|True|1|Yes|yes ]] && set -x
+
 set -ue
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

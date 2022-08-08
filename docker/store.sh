@@ -43,6 +43,15 @@ CONCOURSE_WORKDIR=$(pwd)
 DOCKER_IMAGE_CACHE="${CONCOURSE_WORKDIR}/image-cache"
 pushd "${ARGV_DIRECTORY}"
 
+# hard stop if disabled
+if [[ -f "$(pwd)/.resinci.yml" ]]; then
+    disabled="$(cat < "$(pwd)/.resinci.yml" | yq e - -j | jq -r .disabled)"
+    if [[ -n $disabled ]] && [[ $disabled =~ true|True|1|Yes|yes|On|on ]]; then
+        echo "task|step disabled=${disabled} in .resinci.yml"
+        exit 1
+    fi
+fi
+
 base_org="$(cat < .git/.version | jq -r '.base_org')"
 base_repo="$(cat < .git/.version | jq -r '.base_repo')"
 base_branch="$(cat < .git/.version | jq -r '.head_branch')"
