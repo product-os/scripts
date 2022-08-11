@@ -16,6 +16,13 @@ if [[ -f "${ARGV_DIRECTORY}/.resinci.yml" ]]; then
     fi
 fi
 
+# hard stop if Flowzone is enabled
+if grep -Eqr '\s+uses:\sproduct-os\/flowzone\/\.github\/workflows\/.*' "$(pwd)/.github/workflows/"; then
+    echo "Flowzone already enabled, disabling resinCI" >&2
+    echo "see, https://github.com/product-os/flowzone" >&2
+    exit 1
+fi
+
 detected_type="$(${HERE}/detect-event-type.sh "${ARGV_DIRECTORY}")"
 
 test "${detected_type}" == "$ARGV_EVENT"
