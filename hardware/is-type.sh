@@ -12,6 +12,7 @@ cd $ARGV_DIRECTORY
 #check if we have files of ARG type
 for file in src/*; do
     if [[ $file == *.${ARG_EXT} ]]; then
+        echo "Found ${file}"
         exit 0
     fi
 done
