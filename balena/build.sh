@@ -8,9 +8,16 @@ SRC_PATH="$1"
 if [[ -f "${SRC_PATH}/.resinci.yml" ]]; then
     disabled="$(cat < "${SRC_PATH}/.resinci.yml" | yq e - -j | jq -r .disabled)"
     if [[ -n $disabled ]] && [[ $disabled =~ true|True|1|Yes|yes|On|on ]]; then
-        echo "task|step disabled=${disabled} in .resinci.yml"
+        echo "task|step disabled=${disabled} in .resinci.yml" >&2
         exit 1
     fi
+fi
+
+# hard stop if Flowzone is enabled
+if grep -Eqr '\s+uses:\sproduct-os\/flowzone\/\.github\/workflows\/.*' "${SRC_PATH}/.github/workflows/"; then
+    echo "Flowzone already enabled, disabling resinCI" >&2
+    echo "see, https://github.com/product-os/flowzone" >&2
+    exit 1
 fi
 
 # https://git-secret.io/
